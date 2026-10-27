@@ -32,6 +32,8 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 [hidden]{display:none!important}
 .ms{font-family:'Material Symbols Outlined';font-weight:500;font-size:22px;line-height:1;letter-spacing:normal;white-space:nowrap;font-feature-settings:'liga';-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.no-icons .ms{display:none}
+.no-icons #btn-back::after{content:"←";font-size:24px;line-height:1}
 
 /* ===== ホーム ===== */
 .home-head{padding:28px 0 6px}
@@ -134,6 +136,9 @@ button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .res-list span.th{font-size:15px;color:var(--muted)}
 .res-actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 40px}
 
+@media (min-width:600px) and (max-width:879px){
+  #court{max-height:calc(100vh - 190px)}
+}
 @media (min-width:880px){
   .qgrid{grid-template-columns:minmax(0,1fr) minmax(340px,440px);grid-template-areas:"stage head" "stage answer";grid-template-rows:auto 1fr;column-gap:28px;align-items:start}
   .stage{position:sticky;top:8px}
@@ -974,7 +979,7 @@ const QUESTIONS = [
   think: ['打点：高い。後ろで余裕をもって打てる', '相手：2人とも前に出ている。反応する時間が短い', 'だから：攻め。前に出た2人の間へ、スマッシュ'],
   opts: [
     { k: 'ア', at: [0.0, 10.0], ok: true, shot: 'smash', label: '2人の間へスマッシュ',
-      why: 'ドロップで前に寄せたら、次はスマッシュ。前に出た相手は反応する時間が短い。前後に崩す（d29 の逆）。',
+      why: 'ドロップで前に寄せたら、次はスマッシュ。前に出た相手は反応する時間が短い。前後に崩す（「スマッシュで下げたら、ドロップで前」の逆）。',
       then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.0], mv: { C: [-0.6, 9.8], D: [0.6, 9.8] } } ] },
     { k: 'イ', at: [0.7, 8.1], shot: 'drop', label: 'もう一度ドロップ',
       why: '前に出てきた相手にドロップを続けると、目の前でたたかれる。',
@@ -1528,7 +1533,7 @@ const QUESTIONS = [
       why: '余裕があるときは攻める番。相手から遠いサイドへ打てば、返球が甘くなり、次で決められる。',
       then: [ { hit: 'A', shot: 'smash', to: [-1.9, 10.6], mv: { A: [0.1, 3.4] } }, { hit: 'C', shot: 'block', to: [0.4, 5.6] }, { hit: 'A', shot: 'push', to: [1.9, 9.4] } ] },
     { k: 'イ', at: [0.2, 12.9], shot: 'clear', label: 'とりあえず高いクリアで返す',
-      why: '高いクリアはまちがいではないが、せっかくの余裕を使っていない。相手はらくに返せて、ラリーが最初からになる。苦しいときのクリア（s04）とは場面がちがう。',
+      why: '高いクリアはまちがいではないが、せっかくの余裕を使っていない。相手はらくに返せて、ラリーが最初からになる。追いこまれて苦しいときのクリアとは、場面がちがう。',
       then: [ { hit: 'A', shot: 'clear', to: [0.2, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [0.2, 12.9], text: 'らくに返せる' } }, { hit: 'C', shot: 'drop', to: [-1.4, 5.5], end: 0.6, mv: { A: [-1.4, 5.5] } } ] },
     { k: 'ウ', at: [0.8, 11.4], shot: 'half', label: 'とりあえず相手の正面へ',
       why: '考えずに相手の正面へ返すと、浅くなったとき相手のチャンスボールになる。',
@@ -1694,7 +1699,7 @@ const QUESTIONS = [
   think: ['打点：高い。奥から余裕をもって打てる', '相手：右奥へ大きく下がった。さっきの左前が空いている', 'だから：崩す。相手が下がった逆、左前へ落とす'],
   opts: [
     { k: 'ア', at: [-1.6, 8.9], ok: true, shot: 'drop', label: 'さっきの左前へドロップ（逆をつく）',
-      why: '相手が大きく下がったら、その逆へ。さっきまでいた前が、いちばん遠くなっている。前に動かした相手がまだ前にいるとき（s03）とは逆の答えになる。見るのは相手の動き。',
+      why: '相手が大きく下がったら、その逆へ。さっきまでいた前が、いちばん遠くなっている。前に動かした相手がまだ前にいるとき（「対角線で走らせる」の問題）とは、逆の答えになる。見るのは相手の動き。',
       then: [ { hit: 'A', shot: 'drop', to: [-1.6, 8.9], end: 0.3, mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.2, 3.2] }, { hit: 'A', shot: 'smash', to: [1.9, 10.8] } ] },
     { k: 'イ', at: [2.1, 12.8], shot: 'clear', label: '対角の右奥へクリア',
       why: '相手が下がっていった先に打つと、待たれている。',
@@ -1825,19 +1830,46 @@ const Store = {
 const Progress = {
   KEY: 'bado-drill-v1',
   data: { q: {}, mode: 'doubles', slow: false, today: { ids: {}, last: {} } },
+  ok: true,   // この端末で保存できるか（できないと分かったら、画面の中の記録だけで続ける）
   load() {
-    try {
-      const s = localStorage.getItem(this.KEY);
-      if (s) { const d = JSON.parse(s); if (d && typeof d === 'object') this.data = Object.assign({ q: {}, mode: 'doubles', slow: false }, d); }
-      const t = this.data.today;
-      this.data.today = { ids: (t && t.ids) || {}, last: (t && t.last) || {} };
-    } catch (e) { console.warn('記録を読めませんでした: ' + e.message); }
+    let s;
+    try { s = localStorage.getItem(this.KEY); }
+    catch (e) { this.ok = false; console.warn('記録を読めませんでした: ' + e.message); return; }
+    let d = null;
+    try { if (s) d = JSON.parse(s); } catch (e) { console.warn('記録がこわれていたので、はじめからにします: ' + e.message); }
+    this.data = this.normalize(d);
   },
-  save() { try { localStorage.setItem(this.KEY, JSON.stringify(this.data)); } catch (e) { console.warn('記録を保存できませんでした: ' + e.message); } },
+  /** 端末に残った記録の形を整える。壊れた所だけ捨て、ほかの記録は残す（あとで記録の形を変えたときの守りにもなる） */
+  normalize(d) {
+    const isObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
+    const out = { q: {}, mode: 'doubles', slow: false, today: { ids: {}, last: {} } };
+    if (!isObj(d)) return out;
+    if (isObj(d.q)) {
+      for (const [id, r] of Object.entries(d.q)) {
+        if (QMAP[id] && isObj(r) && typeof r.last === 'boolean') out.q[id] = { n: Number(r.n) || 1, last: r.last, best: r.best === true || r.last };
+      }
+    }
+    if (CATS[d.mode]) out.mode = d.mode;
+    out.slow = d.slow === true;
+    const t = isObj(d.today) ? d.today : {};
+    for (const m of Object.keys(CATS)) {
+      if (isObj(t.ids) && Array.isArray(t.ids[m])) out.today.ids[m] = t.ids[m].filter(id => QMAP[id]);
+      const l = isObj(t.last) ? t.last[m] : null;
+      if (isObj(l) && Number.isFinite(Number(l.score)) && Number.isFinite(Number(l.total)) && /^\d{4}-\d{2}-\d{2}$/.test(String(l.at))) {
+        out.today.last[m] = { score: Number(l.score), total: Number(l.total), at: String(l.at) };
+      }
+    }
+    return out;
+  },
+  save() { try { localStorage.setItem(this.KEY, JSON.stringify(this.data)); } catch (e) { this.ok = false; console.warn('記録を保存できませんでした: ' + e.message); } },
+  /** 書く前に端末の最新の記録を読み直す（同じ端末の別のタブで解いた記録を上書きして消さないため） */
+  update(fn) { if (this.ok) this.load(); fn(this.data); this.save(); },
   record(id, ok) {
-    const r = this.data.q[id] || { n: 0, best: false };
-    r.n++; r.last = ok; r.best = r.best || ok;
-    this.data.q[id] = r; this.save();
+    this.update(d => {
+      const r = d.q[id] || { n: 0, best: false };
+      r.n++; r.last = ok; r.best = r.best || ok;
+      d.q[id] = r;
+    });
   },
   get(id) { return this.data.q[id] || null; },
   reset() { this.data.q = {}; this.data.today = { ids: {}, last: {} }; this.save(); },
@@ -2127,7 +2159,7 @@ function renderHome() {
       <button class="btn" data-start="miss" ${miss.length ? '' : 'disabled'}>まちがえた問題<small>${miss.length}問</small></button>
     </div>
     ${showA2HS() ? '<p class="a2hs">スマホは「ホーム画面に追加」して開くと、記録が消えにくくなります（iPhone：共有ボタン →「ホーム画面に追加」）</p>' : ''}
-    ${last ? `<p class="today-last">前回の今日の10問：<b>${last.score}</b> / ${last.total}（${Number(last.at.slice(5, 7))}/${Number(last.at.slice(8, 10))}）</p>` : ''}
+    ${last ? `<p class="today-last">前回の今日の10問：<b>${Number(last.score)}</b> / ${Number(last.total)}（${Number(last.at.slice(5, 7))}/${Number(last.at.slice(8, 10))}）</p>` : ''}
     <p class="h3">場面で選ぶ</p>
     <ul class="cats">${cats}</ul>
     <p class="legend"><span><span class="dot blue"></span>自分たち（A・B）</span><span><span class="dot red"></span>相手（C・D）</span><span>全員右利きの想定</span></p>`;
@@ -2138,7 +2170,7 @@ function startFrom(key) {
   let list;
   if (key === 'today') {
     const ids = pickToday(Store.mode);
-    Progress.data.today.ids[Store.mode] = ids; Progress.save();   // 始めた時点で「前回の10問」にする（途中でやめても、次は別の10問）
+    Progress.update(d => { d.today.ids[Store.mode] = ids; });   // 始めた時点で「前回の10問」にする（途中でやめても、次は別の10問）
     console.log(`今日の10問（${Store.mode}）: ${ids.join(' ')}`);
     startSet(ids, 'today');
     return;
@@ -2275,7 +2307,7 @@ function renderResult() {
   const ids = Store.set, okN = ids.filter(id => Store.res[id]).length;
   const miss = ids.filter(id => !Store.res[id]);
   const today = Store.kind === 'today';
-  if (today) { Progress.data.today.last[Store.mode] = { score: okN, total: ids.length, at: localDate() }; Progress.save(); }
+  if (today) Progress.update(d => { d.today.last[Store.mode] = { score: okN, total: ids.length, at: localDate() }; });
   $('#view-result').innerHTML = `
     <div class="res-head"><span class="lab">${today ? '今日の10問の結果' : '結果'}</span><p class="score"><b>${okN}</b>/ ${ids.length} 問 正解</p></div>
     <ol class="res-list">${ids.map(id => { const q = QMAP[id], ok = Store.res[id];
@@ -2298,13 +2330,13 @@ function showStage() {
 }
 function bind() {
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-    Store.mode = t.dataset.mode; Progress.data.mode = Store.mode; Progress.save(); renderHome();
+    Store.mode = t.dataset.mode; Progress.update(d => { d.mode = Store.mode; }); renderHome();
   }));
   $('#home-body').addEventListener('click', e => { const b = e.target.closest('[data-start]'); if (b && !b.disabled) startFrom(b.dataset.start); });
   $('#btn-back').addEventListener('click', () => { renderHome(); show('home'); });
   $('#btn-replay').addEventListener('click', () => Quiz.playSetup());
   $('#btn-slow').addEventListener('click', e => {
-    Anim.slow = !Anim.slow; Progress.data.slow = Anim.slow; Progress.save();
+    Anim.slow = !Anim.slow; Progress.update(d => { d.slow = Anim.slow; });
     e.currentTarget.setAttribute('aria-pressed', Anim.slow);
   });
   $('#court').addEventListener('click', e => {
@@ -2334,9 +2366,17 @@ function bind() {
     armed = Date.now(); b.textContent = 'もう一度押すと、正解の記録がすべて消えます'; b.classList.add('warn');
     setTimeout(() => { if (armed && Date.now() - armed >= 4000) { b.textContent = '記録を消す'; b.classList.remove('warn'); armed = 0; } }, 4100);
   });
-  $('#btn-copylog').addEventListener('click', () => {
+  // 学校の GAS の画面などでは自動のコピーが許されないことがある → ログを選んだ状態にして、手でコピーしてもらう
+  $('#btn-copylog').addEventListener('click', e => {
+    const b = e.currentTarget, pre = $('#debug-text');
+    const say = t => { b.textContent = t; setTimeout(() => { b.textContent = 'ログをコピー'; }, 4000); };
+    const selectLog = () => {
+      try { const r = document.createRange(); r.selectNodeContents(pre); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } catch (err) { /* 選べなくても続ける */ }
+      say('ログを選びました。Ctrl+C（スマホは長押し）でコピーしてください');
+    };
     const text = DebugLog.lines.join('\n') || '(ログなし)';
-    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => console.log('ログをコピーしました'), () => console.warn('コピーできませんでした'));
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => say('コピーしました'), selectLog);
+    else selectLog();
   });
 }
 
@@ -2351,6 +2391,8 @@ function lint() {
     if (q.opts.filter(o => o.ok).length !== 1) errs.push(tag + ': 正解がちょうど1つでない');
     if (!CATS[q.mode].some(c => c.id === q.cat)) errs.push(tag + ': cat が無い');
     if (!['A', 'B'].includes(q.who) || !q.start[q.who]) errs.push(tag + ': who がおかしい');
+    const shownText = [q.ask, q.scene, q.theory, q.drill, ...(q.think || []), ...q.opts.flatMap(o => [o.label, o.why])].join(' ');
+    if (/[ds]\d\d/.test(shownText)) errs.push(tag + ': 生徒に見える文に問題番号（d01・s03 など）が入っている');
     if (q.mode === 'singles' && Object.keys(q.start).some(k => !['A', 'C'].includes(k))) errs.push(tag + ': シングルスに A・C 以外がいる');
     try {
       const base = { pos: clonePos(q.start), sh: q.sh ? { x: q.sh[0], y: q.sh[1], h: q.sh[2] } : null };
@@ -2410,6 +2452,18 @@ window.BD = {
   shuffleOpts,
 };
 
+/** アイコンの字（Material Symbols）が読めない回線では、アイコンを消す（「arrow_back」などの文字が出ないように） */
+function hideIconsIfNoFont() {
+  try {
+    const probe = document.createElement('span');
+    probe.className = 'ms'; probe.textContent = 'arrow_back';
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden';
+    document.body.appendChild(probe);
+    const judge = () => { if (probe.getBoundingClientRect().width > 40) document.documentElement.classList.add('no-icons'); };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(judge, 300));
+  } catch (e) { /* 判定できなくても使える */ }
+}
+
 /* ---------- [S15] 起動 ---------- */
 (function boot() {
   try {
@@ -2420,6 +2474,7 @@ window.BD = {
     Court.init();
     bind();
     renderHome();
+    hideIconsIfNoFont();
     const errs = lint();
     if (errs.length) console.warn('問題データの点検: ' + errs.join(' / '));
     console.log(`起動しました（問題 ${QUESTIONS.length} 問）`);
