@@ -1,0 +1,2416 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>バド戦術ドリル</title>
+<meta name="theme-color" content="#2b4d3f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="バド戦術">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0&display=block" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f2ec; --paper:#fff; --ink:#1b231f; --muted:#5b6862; --rule:#d6d5cb; --rule2:#e6e5dd;
+  --blue:#2459d6; --red:#d33a3a; --yel:#ffd84d; --ok:#167a45; --ng:#c0392b; --floor:#2b4d3f; --focus:#ffb800;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:500 16px/1.65 "Zen Kaku Gothic New",system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
+button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.ring{outline:none}
+.ring:focus-visible polygon{stroke:var(--focus);stroke-width:6}
+[hidden]{display:none!important}
+.ms{font-family:'Material Symbols Outlined';font-weight:500;font-size:22px;line-height:1;letter-spacing:normal;white-space:nowrap;font-feature-settings:'liga';-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+/* ===== ホーム ===== */
+.home-head{padding:28px 0 6px}
+.home-head h1{font-size:30px;font-weight:900;letter-spacing:.02em}
+.home-head p{margin-top:6px;color:var(--muted)}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--rule);margin-top:18px}
+.tab{padding:10px 2px;min-height:44px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);border-color:var(--ink)}
+.start-row{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:6px;font-weight:700;border:1px solid var(--ink);background:var(--paper)}
+.btn.primary{background:var(--ink);color:#fff}
+.btn small{font-weight:500;opacity:.75}
+.btn:disabled{opacity:.35;cursor:default}
+.a2hs{margin:-12px 0 16px;font-size:13px;color:var(--muted)}
+.a2hs+.today-last{margin-top:0}
+.today-last{margin:-12px 0 20px;font-size:14px;color:var(--muted)}
+.today-last b{color:var(--ink)}
+.h3{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-bottom:6px}
+.cats{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.cats li{border-bottom:1px solid var(--rule)}
+.cats button{width:100%;display:grid;grid-template-columns:1fr auto;gap:0 16px;padding:14px 6px;min-height:64px}
+.cats button:hover{background:var(--rule2)}
+.c-name{font-weight:700;font-size:17px}
+.c-desc{grid-column:1;color:var(--muted);font-size:14px}
+.c-prog{grid-row:1/3;grid-column:2;align-self:center;text-align:right;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.4}
+.c-prog b{color:var(--ink);font-size:16px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin:18px 0 0;font-size:14px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.dot.blue{background:var(--blue)} .dot.red{background:var(--red)}
+.home-foot{margin:40px 0 32px;padding-top:12px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-start;font-size:14px;color:var(--muted)}
+.link{text-decoration:underline;text-underline-offset:3px;min-height:32px}
+.link.warn{color:var(--ng)}
+#debug{flex-basis:100%}
+#debug summary{cursor:pointer;min-height:32px}
+#debug pre{background:#111;color:#cfe8d6;padding:10px;border-radius:4px;max-height:240px;overflow:auto;font-size:12px;white-space:pre-wrap;margin:8px 0}
+
+/* ===== 問題 ===== */
+.qbar{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.icon{width:44px;height:44px;display:grid;place-items:center;border-radius:6px}
+.icon:hover{background:var(--rule2)}
+.count{font-weight:700;font-variant-numeric:tabular-nums}
+.tag{font-size:13px;border:1px solid var(--rule);padding:1px 8px;border-radius:3px;color:var(--muted);background:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lv{margin-left:auto;font-size:14px;color:#9a7300;font-weight:700;white-space:nowrap}
+.qgrid{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "stage" "answer";gap:12px;padding:12px 0 36px}
+.q-head{grid-area:head}
+.q-head h2{font-size:23px;font-weight:900;line-height:1.35}
+.q-head p{margin-top:4px}
+.stage{grid-area:stage;background:var(--floor);border-radius:6px;overflow:hidden}
+#court{display:block;width:100%;height:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#court text{font-family:"Zen Kaku Gothic New",system-ui,sans-serif;text-anchor:middle;font-weight:900;pointer-events:none}
+.stage-tools{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;padding:6px 8px;background:#1f3a2e;color:#e6efe9;font-size:14px}
+.tool{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 10px;border-radius:4px}
+.tool:hover{background:rgba(255,255,255,.1)}
+.tool[aria-pressed=true]{background:rgba(255,255,255,.2)}
+.tool .ms{font-size:20px}
+.stage-tools .legend{margin:0 4px 0 auto;color:#cfdcd5;font-size:13px;gap:2px 12px}
+.answer{grid-area:answer}
+.status{color:var(--muted);font-size:14px;margin-bottom:8px;min-height:1.6em}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 14px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;width:100%}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt:disabled{opacity:.45;cursor:default}
+.opt .k,.ex .k{font-weight:900;font-size:20px;width:26px;flex:none;text-align:center}
+.shot{display:inline-block;font-size:12px;line-height:1.5;border:1px solid var(--rule);border-radius:3px;padding:0 6px;margin-right:8px;color:var(--muted);vertical-align:1px;white-space:nowrap}
+.verdict{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-size:28px;font-weight:900;line-height:1.3;padding-bottom:10px}
+.verdict.ok{color:var(--ok)} .verdict.ng{color:var(--ng)}
+.verdict small{font-size:16px;color:var(--ink);font-weight:700}
+.sec{border-top:1px solid var(--rule);padding:12px 0}
+.lab{display:block;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-bottom:2px}
+.theory-t{font-size:19px;font-weight:900;line-height:1.5}
+.explain{list-style:none;margin:0;padding:0}
+.ex+.ex{border-top:1px solid var(--rule2)}
+.ex button{width:100%;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 0}
+.ex .j{font-weight:900;font-size:18px;width:20px;flex:none}
+.ex.ok .j{color:var(--ok)} .ex.ng .j{color:var(--ng)}
+.ex .t{font-weight:700}
+.you{display:inline-block;font-size:11px;font-weight:700;border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-left:6px;vertical-align:2px;color:var(--muted)}
+.ex .play{margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:2px;font-size:13px;color:var(--muted);padding-left:8px}
+.ex.playing .play{color:var(--ink);font-weight:700}
+.ex p{margin:0 0 10px 66px;font-size:15px}
+.drill p{font-size:15px}
+.look{font-size:14px;margin-bottom:6px;padding:8px 10px;background:var(--paper);border:1px solid var(--rule);border-radius:4px}
+.look b{margin-right:10px}
+.think{list-style:none;margin:0;padding:0;counter-reset:th}
+.think li{display:flex;gap:10px;padding:3px 0;font-size:15px}
+.think li::before{counter-increment:th;content:counter(th);flex:none;width:20px;height:20px;margin-top:3px;border:1px solid var(--ink);border-radius:50%;font-size:12px;line-height:18px;text-align:center}
+.think b{flex:none;width:3.2em}
+.next-row{padding-top:14px}
+.next-row .btn{width:100%}
+
+/* ===== 結果 ===== */
+.res-head{padding:28px 0 12px;border-bottom:1px solid var(--rule)}
+.score{font-size:20px;font-weight:700;margin-top:2px}
+.score b{font-size:48px;font-weight:900;margin-right:6px}
+.res-list{list-style:none;margin:0;padding:0}
+.res-list li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.res-list .j{font-weight:900;font-size:22px;width:24px;flex:none;line-height:1.3}
+.res-list .ok .j{color:var(--ok)} .res-list .ng .j{color:var(--ng)}
+.res-list b{display:block}
+.res-list span.th{font-size:15px;color:var(--muted)}
+.res-actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 40px}
+
+@media (min-width:880px){
+  .qgrid{grid-template-columns:minmax(0,1fr) minmax(340px,440px);grid-template-areas:"stage head" "stage answer";grid-template-rows:auto 1fr;column-gap:28px;align-items:start}
+  .stage{position:sticky;top:8px}
+  #court{max-height:calc(100vh - 110px)}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+  <!-- ===== ホーム ===== -->
+  <section id="view-home">
+    <header class="home-head">
+      <h1>バド戦術ドリル</h1>
+      <p>場面を見て、動く場所・打つ場所を選ぶ。○ と × の理由を、動きで確かめる。</p>
+    </header>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-mode="doubles">ダブルス</button>
+      <button class="tab" role="tab" data-mode="singles">シングルス</button>
+    </nav>
+    <div id="home-body"></div>
+    <footer class="home-foot">
+      <button class="link" id="btn-reset">記録を消す</button>
+      <details id="debug">
+        <summary>デバッグログを表示</summary>
+        <pre id="debug-text">（まだ何もありません）</pre>
+        <button class="link" id="btn-copylog">ログをコピー</button>
+      </details>
+    </footer>
+  </section>
+
+  <!-- ===== 問題 ===== -->
+  <section id="view-quiz" hidden>
+    <div class="qbar">
+      <button class="icon" id="btn-back" aria-label="ホームへ"><span class="ms">arrow_back</span></button>
+      <span class="count" id="q-count"></span>
+      <span class="tag" id="q-tag"></span>
+      <span class="lv" id="q-lv"></span>
+    </div>
+    <div class="qgrid">
+      <div class="q-head">
+        <h2 id="q-ask"></h2>
+        <p id="q-scene"></p>
+      </div>
+      <div class="stage">
+        <svg id="court" viewBox="0 0 800 1140" role="img" aria-label="コートの図"></svg>
+        <div class="stage-tools">
+          <button class="tool" id="btn-replay"><span class="ms">replay</span>場面をもう一度</button>
+          <button class="tool" id="btn-slow" aria-pressed="false"><span class="ms">slow_motion_video</span>ゆっくり</button>
+          <span class="legend"><span><span class="dot blue"></span>自分たち</span><span><span class="dot red"></span>相手</span></span>
+        </div>
+      </div>
+      <div class="answer" id="q-answer"></div>
+    </div>
+  </section>
+
+  <!-- ===== 結果 ===== -->
+  <section id="view-result" hidden></section>
+</div>
+
+<script>
+/* =====================================================================
+ * バド戦術ドリル（v0.1 模型）
+ * 単一 HTML・通信なし。記録は端末の localStorage にだけ残す。
+ * ===================================================================== */
+
+/* ---------- [S0] 画面組み込み型デバッグログ ---------- */
+const DebugLog = {
+  lines: [],
+  push(level, args) {
+    const t = new Date().toTimeString().slice(0, 8);
+    const text = args.map(a => { if (typeof a === 'string') return a; try { return JSON.stringify(a); } catch (e) { return String(a); } }).join(' ');
+    this.lines.push(`[${t}] ${level} ${text}`);
+    if (this.lines.length > 300) this.lines.shift();
+    const el = document.getElementById('debug-text');
+    if (el) el.textContent = this.lines.join('\n');
+  }
+};
+['log', 'warn', 'error'].forEach(k => {
+  const orig = console[k].bind(console);
+  console[k] = (...a) => { DebugLog.push(k.toUpperCase(), a); orig(...a); };
+});
+window.addEventListener('error', e => DebugLog.push('ERROR', [e.message + ' (' + (e.lineno || '-') + '行)']));
+window.addEventListener('unhandledrejection', e => DebugLog.push('ERROR', ['Promise: ' + ((e.reason && e.reason.message) || e.reason)]));
+
+/* ---------- [S1] ユーティリティ ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const f1 = n => Math.round(n * 10) / 10;
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const clonePos = p => { const o = {}; for (const k in p) o[k] = p[k].slice(); return o; };
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const STARS = ['', '★☆☆ きほん', '★★☆ ふつう', '★★★ むずかしい'];
+
+/* ---------- [S2] 定数・問題データ ----------
+ * 座標（m）：x は左右（-3.05〜3.05、自分たちから見て右が＋）。
+ *           y は奥行き（0＝自分たちのバックライン、6.7＝ネット、13.4＝相手のバックライン）。
+ * 全員右利き。相手は向かい合っているので、相手のバック側は x＋（こちらから見て右）。
+ *
+ * 1つの問題：start（最初の立ち位置）→ setup（場面までの打ち合い）→ 問い → 選択肢ごとの then（選んだあとの動き）。
+ * 1打（step）：{ hit:打つ人, shot:球種, to:[x,y]（落ちる／取られる所）, mv:{人:[x,y]}（同時に動く人）, mark:{at,text}, end:高さ }
+ * 次に打つ人は、とくに書かなければ to の位置まで自動で動く。シャトルがネットにかかる軌道は自動で持ち上げる。
+ */
+const HS = 0.75;          // 高さの見せ方（実際の高さ×HS で描く）
+const NET_CLEAR = 1.75;   // ネットを越えるときの最低の高さ（m）
+const GAP = 0.14;         // 1打ごとの間（秒）
+const SLOW = 1.9;         // 「ゆっくり」の倍率
+const LEAD = 0.45;        // 再生を始める前の間（秒）
+
+const SHOT = {
+  smash:  { h0: 3.0, a: 0.5,  t: 0.55, name: 'スマッシュ' },
+  clear:  { h0: 2.6, a: 4.0,  t: 1.45, name: 'クリア' },
+  aclear: { h0: 2.6, a: 1.6,  t: 1.0,  name: '速いクリア' },
+  half:   { h0: 2.6, a: 1.4,  t: 1.0,  name: '浅い球' },
+  lob:    { h0: 0.5, a: 4.0,  t: 1.45, name: 'ロブ' },
+  drop:   { h0: 2.6, a: 0.6,  t: 1.05, name: 'ドロップ' },
+  net:    { h0: 0.9, a: 0.45, t: 0.85, name: 'ヘアピン' },
+  float:  { h0: 0.8, a: 0.5,  t: 0.85, name: '浮いた球' },
+  push:   { h0: 1.7, a: 0.05, t: 0.5,  name: 'プッシュ' },
+  drive:  { h0: 1.5, a: 0.25, t: 0.6,  name: 'ドライブ' },
+  block:  { h0: 0.7, a: 0.5,  t: 0.85, name: 'レシーブ' },
+  sshort: { h0: 1.0, a: 0.35, t: 0.85, name: 'ショートサービス' },
+  slong:  { h0: 1.0, a: 4.5,  t: 1.55, name: 'ロングサービス' },
+  shalf:  { h0: 1.0, a: 1.4,  t: 1.0,  name: '浮いたサービス' },
+};
+
+const CATS = {
+  doubles: [
+    { id: 'kirikae', name: '形の切りかえ',     desc: 'サイドバイサイド⇄トップアンドバック。上げたら横、上げさせたら縦' },
+    { id: 'ito',     name: '考えて打つ',       desc: '打点の高さと相手の位置を見て、攻め・守り・崩すを決めてから打つ' },
+    { id: 'kumitate', name: '組み立て',        desc: '1本で決めようとしない。崩してから攻める、2本・3本の流れ' },
+    { id: 'zenei',   name: '前衛の役割',       desc: 'ネット前で、どこに立ち、何をたたくか' },
+    { id: 'katachi', name: '形の中の立ち位置', desc: '横並び・縦の形のそれぞれで、どこに立つか' },
+    { id: 'mamori',  name: 'レシーブとドライブ', desc: '守りの球を、攻めにつなげる' },
+    { id: 'serve',   name: 'サービスとレシーブ', desc: '1球目・2球目・3球目の動き' },
+    { id: 'haikyu',  name: '配球',             desc: 'どこへ打てば、相手が困るか' },
+  ],
+  singles: [
+    { id: 'ito',      name: '考えて打つ',   desc: '打点の高さと相手の位置を見て、攻め・守り・崩すを決めてから打つ' },
+    { id: 'kumitate', name: '組み立て',     desc: '1本で決めようとしない。崩してから攻める、2本・3本の流れ' },
+    { id: 'home',     name: '戻る位置',     desc: '打ったあと、どこで構えるか' },
+    { id: 'haikyu',   name: '配球',         desc: '相手を動かして、空いたところをつく' },
+    { id: 'kurushii', name: '苦しいとき',   desc: '追いこまれたときの返し方' },
+    { id: 'serve',    name: 'サービス',     desc: '1球目で主導権をにぎる' },
+  ],
+};
+
+const QUESTIONS = [
+/* ===== ダブルス ===== */
+{ id: 'd01', mode: 'doubles', cat: 'zenei', lv: 1, who: 'B', type: 'move',
+  title: 'スマッシュのときの前衛',
+  ask: '前衛の B は、どこに構える？',
+  scene: 'A が右奥から、ストレートにスマッシュを打つ。',
+  start: { A: [1.5, 2.2], B: [0.0, 4.3], C: [-1.4, 9.6], D: [1.0, 8.9] },
+  setup: [ { hit: 'D', shot: 'lob', to: [1.7, 1.0], mv: { D: [1.6, 10.6], C: [-1.5, 10.6] } } ],
+  opts: [
+    { k: 'ア', at: [0.9, 4.7], ok: true, label: '右前（シャトルが向かった側）',
+      why: 'シャトルが向かった側に寄る。ストレートのスマッシュなら右。いちばん速く返ってくるストレートの返球を、前で止められる。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.6, 10.8], mv: { B: [0.9, 4.7] } }, { hit: 'D', shot: 'block', to: [1.0, 5.3] }, { hit: 'B', shot: 'push', to: [-0.2, 9.4] } ] },
+    { k: 'イ', at: [-1.3, 4.7], label: '左前',
+      why: '左に寄ると、いちばん返ってきやすいストレートの前が空く。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.6, 10.8], mv: { B: [-1.3, 4.7] } }, { hit: 'D', shot: 'block', to: [1.3, 5.4], mv: { B: [-0.2, 5.0] }, mark: { at: [1.3, 5.4], text: '空く' } } ] },
+    { k: 'ウ', at: [0.1, 2.9], label: 'まん中の少し後ろ',
+      why: '下がりすぎ。ネット前に落とされた球に届かない。前衛はショートサービスラインのあたりで、ラケットを上げて待つ。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.6, 10.8], mv: { B: [0.1, 2.9] } }, { hit: 'D', shot: 'block', to: [0.8, 5.6], mv: { B: [0.5, 4.0] }, mark: { at: [0.8, 5.6], text: '空く' } } ] },
+  ],
+  theory: '前衛は、シャトルが向かった側に寄る',
+  drill: '3人1組。後衛役が左右からスマッシュ、受け手はストレートに返す。前衛役はシャトルが向かった側へ一歩寄って、前で止める。左右5本ずつ。' },
+
+{ id: 'd02', mode: 'doubles', cat: 'kirikae', lv: 1, who: 'B', type: 'move',
+  title: 'ロブを上げたあとの形',
+  ask: 'ロブを上げたあと、B はどこへ？',
+  scene: '相手のヘアピンを、前衛の B がロブで奥へ上げる。相手は次にスマッシュを打ってくる。',
+  start: { A: [0.0, 2.0], B: [0.4, 4.8], C: [-0.7, 8.5], D: [0.6, 11.2] },
+  setup: [ { hit: 'C', shot: 'net', to: [1.0, 5.6] } ],
+  opts: [
+    { k: 'ア', at: [1.0, 5.0], label: '前に残る',
+      why: '前に残ると、守るのは後ろの A だけ。左右に打ち分けられたら止められない。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.4, 12.3], mv: { B: [1.0, 5.0], C: [-1.2, 9.6] } }, { hit: 'D', shot: 'smash', to: [-2.1, 3.2], mv: { A: [-0.5, 2.2] }, mark: { at: [-2.1, 3.2], text: '空く' } } ] },
+    { k: 'イ', at: [1.3, 3.3], ok: true, label: '右の中ほどへ下がる（横並び）',
+      why: '上げたら横並び（サイドバイサイド）。B が右、A が左に分かれて、スマッシュを左右で受ける。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.4, 12.3], mv: { B: [1.3, 3.3], A: [-1.3, 3.3], C: [-1.2, 9.6] } }, { hit: 'D', shot: 'smash', to: [1.4, 3.5] }, { hit: 'B', shot: 'block', to: [1.6, 8.6] } ] },
+    { k: 'ウ', at: [1.3, 1.2], label: '右奥まで下がる',
+      why: '下がりすぎ。スマッシュは取れても、前に落とされると2人とも届かない。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.4, 12.3], mv: { B: [1.3, 1.2], A: [-1.3, 3.3], C: [-1.2, 9.6] } }, { hit: 'D', shot: 'drop', to: [1.0, 5.5], mv: { B: [1.2, 2.8] }, mark: { at: [1.0, 5.5], text: '空く' } } ] },
+  ],
+  theory: '上げたら横並び（サイドバイサイド）。上げた側は守りの番',
+  drill: '2対2で、前衛役がロブを上げたら「サイド！」と声を出して横並びへ。ノッカーはスマッシュとドロップをまぜて出す。' },
+
+{ id: 'd03', mode: 'doubles', cat: 'katachi', lv: 3, who: 'B', type: 'move',
+  title: '横並びの守りの寄り方',
+  ask: 'B は、どこに構える？',
+  scene: 'A と B は横並びで守っている。相手の D が、こちらから見て左奥からスマッシュを打つ。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [0.6, 9.4], D: [0.0, 11.0] },
+  setup: [ { hit: 'B', shot: 'lob', to: [-1.9, 12.4], mv: { A: [-1.5, 2.8] } } ],
+  opts: [
+    { k: 'ア', at: [0.6, 3.6], ok: true, label: 'まん中寄りの少し前',
+      why: '2人ともシャトルの側（左）へ寄る。ストレート側の A はやや後ろ、クロス側の B はやや前で、センターとクロスのドロップを受け持つ。',
+      then: [ { mv: { B: [0.6, 3.6] }, t: 0.5 }, { hit: 'D', shot: 'smash', to: [0.3, 3.3] }, { hit: 'B', shot: 'block', to: [1.9, 8.7] } ] },
+    { k: 'イ', at: [2.0, 3.0], label: '右の外側',
+      why: '外へ広がると、2人の間（センター）が空く。どちらが取るか迷って、お見合いになる。',
+      then: [ { mv: { B: [2.0, 3.0] }, t: 0.5 }, { hit: 'D', shot: 'smash', to: [0.2, 2.9], mv: { A: [-1.0, 2.8], B: [1.6, 3.0] }, mark: { at: [0.2, 2.9], text: '空く' } } ] },
+    { k: 'ウ', at: [1.2, 1.3], label: '右の後ろ',
+      why: '下がりすぎ。クロスのドロップが前に落ちる。',
+      then: [ { mv: { B: [1.2, 1.3] }, t: 0.5 }, { hit: 'D', shot: 'drop', to: [1.0, 5.4], mv: { B: [1.1, 2.7] }, mark: { at: [1.0, 5.4], text: '空く' } } ] },
+  ],
+  theory: '守りはシャトルの側へ寄る。ストレート側はやや後ろ、クロス側はやや前',
+  drill: 'ノッカーがコートの左奥・右奥からスマッシュを打つ。守りの2人は、シャトルが左右に動くたびに寄り直す。「寄る→止まる→構える」を1本ずつ。' },
+
+{ id: 'd04', mode: 'doubles', cat: 'kirikae', lv: 2, who: 'B', type: 'move',
+  title: '前に入ったら後ろへ回る',
+  ask: 'B は、どこへ動く？',
+  scene: '横並びで守っていたら、相手が左前にドロップ。A が前に出て、ヘアピンで返す。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.9, 9.6], D: [0.8, 11.8] },
+  setup: [ { hit: 'D', shot: 'drop', to: [-1.1, 5.6] } ],
+  opts: [
+    { k: 'ア', at: [1.3, 3.2], label: '右の中ほどのまま',
+      why: '横並びのままだと、後ろががら空き。ロブを上げられると届かない。',
+      then: [ { hit: 'A', shot: 'net', to: [-0.8, 8.4], mv: { B: [1.3, 3.2] } }, { hit: 'C', shot: 'lob', to: [-1.4, 0.8], mv: { D: [1.2, 10.6], B: [0.4, 2.2] }, mark: { at: [-1.4, 0.8], text: '空く' } } ] },
+    { k: 'イ', at: [0.0, 2.2], ok: true, label: '後ろのまん中へ',
+      why: 'A が前に入ったら、B は後ろへ回る。前と後ろの「縦の形」になり、上がった球をすぐ攻められる。',
+      then: [ { hit: 'A', shot: 'net', to: [-0.8, 8.4], mv: { B: [0.0, 2.2] } }, { hit: 'C', shot: 'lob', to: [-1.2, 1.1], mv: { D: [1.4, 10.6] } }, { hit: 'B', shot: 'smash', to: [0.1, 10.5], mv: { C: [-1.4, 10.6] } } ] },
+    { k: 'ウ', at: [0.3, 5.0], label: 'A といっしょに前へ',
+      why: '2人とも前にいると、後ろに上げられて終わり。',
+      then: [ { hit: 'A', shot: 'net', to: [-0.8, 8.4], mv: { B: [0.3, 5.0] } }, { hit: 'C', shot: 'lob', to: [0.9, 0.9], mv: { D: [1.2, 10.6], B: [0.6, 3.4] }, mark: { at: [0.9, 0.9], text: '空く' } } ] },
+  ],
+  theory: '1人が前に入ったら、もう1人は後ろへ。横並びから縦の形（トップアンドバック）に回る',
+  drill: '2対1。守りの2人に、ノッカーがスマッシュ→ドロップの順で出す。ドロップを取りに前へ出た人を見て、もう1人が「うしろ！」と声を出して下がる。' },
+
+{ id: 'd05', mode: 'doubles', cat: 'serve', lv: 1, who: 'A', type: 'shot',
+  title: 'ダブルスのサービス',
+  ask: 'A は、どこへサービスを打つ？',
+  scene: 'A が右のサービスコートからサービス。相手の C は前に構えている。',
+  start: { A: [0.45, 4.3], B: [-0.1, 2.5], C: [-0.7, 9.3], D: [0.9, 11.3] },
+  sh: [0.45, 4.3, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [-0.3, 8.95], ok: true, shot: 'sshort', label: '低く短く、センター前（T）へ',
+      why: '低く短いサービスは、相手に上から打たせない。センター寄りなら、返球の角度もせまい。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95] }, { hit: 'C', shot: 'net', to: [0.2, 5.3] }, { hit: 'A', shot: 'push', to: [-1.6, 10.2] } ] },
+    { k: 'イ', at: [-1.2, 12.4], shot: 'slong', label: '高く、いちばん奥へ',
+      why: '高く上げると、相手が先にスマッシュで攻めてくる。基本はショート。ロングは、相手が前に詰めてくるときにまぜる。',
+      then: [ { hit: 'A', shot: 'slong', to: [-1.2, 12.4] }, { hit: 'C', shot: 'smash', to: [-1.9, 3.3], mark: { at: [-1.9, 3.3], text: '先に攻められる' } } ] },
+    { k: 'ウ', at: [-1.0, 10.6], shot: 'shalf', label: 'ふわっと、中ほどへ',
+      why: '中途半端な高さの球は、相手が待ちかまえて上からたたける。',
+      then: [ { hit: 'A', shot: 'shalf', to: [-1.0, 10.6] }, { hit: 'C', shot: 'smash', to: [0.9, 3.4], mark: { at: [0.9, 3.4], text: 'たたかれる' } } ] },
+  ],
+  theory: 'ダブルスのサービスは、低く短く。まずはセンター前（T）をねらう',
+  drill: 'サービス10本。ネットの白帯の上30cmにひもを張り、その下を通して T のまわりに落とす。入った本数を記録する。' },
+
+{ id: 'd06', mode: 'doubles', cat: 'serve', lv: 1, who: 'B', type: 'move',
+  title: 'サービスのあとのパートナー',
+  ask: 'パートナーの B は、どこに構える？',
+  scene: 'A がショートサービスを打ち、そのまま前に残る。',
+  start: { A: [0.45, 4.3], B: [0.9, 2.0], C: [-0.7, 9.3], D: [0.9, 11.3] },
+  sh: [0.45, 4.3, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [0.0, 2.4], ok: true, label: 'A のうしろ、まん中',
+      why: 'サービスのあとは縦の形。A が前、B は後ろのまん中で、上がった球を攻める。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { B: [0.0, 2.4] } }, { hit: 'C', shot: 'lob', to: [1.1, 1.0], mv: { D: [1.4, 10.6] } }, { hit: 'B', shot: 'smash', to: [0.0, 10.5], mv: { C: [-1.4, 10.6] } } ] },
+    { k: 'イ', at: [-1.2, 4.4], label: 'A のとなり（前）',
+      why: '2人とも前にいると、後ろに上げられたら届かない。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { B: [-1.2, 4.4] } }, { hit: 'C', shot: 'lob', to: [0.6, 0.9], mv: { B: [-0.6, 3.0], D: [1.4, 10.6] }, mark: { at: [0.6, 0.9], text: '空く' } } ] },
+    { k: 'ウ', at: [-1.4, 0.9], label: '左奥のすみ',
+      why: 'すみに下がると、反対側の中ほどが空く。後ろはまん中で、どちらへも動ける位置に。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { B: [-1.4, 0.9] } }, { hit: 'C', shot: 'push', to: [2.2, 3.2], mv: { B: [-0.4, 1.6] }, mark: { at: [2.2, 3.2], text: '空く' } } ] },
+  ],
+  theory: 'サービスのあとは縦の形。サーバーは前、パートナーは後ろのまん中',
+  drill: 'サービスからの3球目練習。サービス→相手はロブかプッシュ→パートナーが後ろから打つ。サーバーはラケットを上げたまま前に残る。' },
+
+{ id: 'd07', mode: 'doubles', cat: 'serve', lv: 2, who: 'B', type: 'shot',
+  title: '浮いたサービスのレシーブ',
+  ask: 'B は、どこへ打つ？',
+  scene: '相手のショートサービスが少し浮いた。サーバーの C は前に残り、D は後ろにいる。',
+  start: { A: [-0.1, 2.3], B: [0.5, 4.5], C: [-0.4, 9.1], D: [0.2, 11.3] },
+  sh: [-0.4, 9.1, 1.0],
+  setup: [ { hit: 'C', shot: 'float', to: [0.45, 4.9], mv: { C: [-0.3, 8.9] } } ],
+  opts: [
+    { k: 'ア', at: [-0.3, 8.0], shot: 'net', label: 'ネット前（サーバーの正面）',
+      why: 'サーバーの C は前で待っている。正面のネット前は、たたかれやすい。',
+      then: [ { hit: 'B', shot: 'net', to: [-0.3, 8.0] }, { hit: 'C', shot: 'push', to: [-1.9, 3.9], mark: { at: [-1.9, 3.9], text: 'たたかれる' } } ] },
+    { k: 'イ', at: [1.9, 10.3], ok: true, shot: 'push', label: 'サイドの中ほどへ沈める',
+      why: '前の C と後ろの D の「間」をねらう。サイドの中ほどは、2人とも取りにくい。',
+      then: [ { hit: 'B', shot: 'push', to: [1.9, 10.3], mv: { D: [1.0, 10.9], C: [0.3, 9.0] } } ] },
+    { k: 'ウ', at: [0.3, 12.5], shot: 'lob', label: '奥へ高く上げる',
+      why: 'せっかくのチャンスを手放す。上げると、相手のスマッシュから始まる。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.5] }, { hit: 'D', shot: 'smash', to: [-2.0, 3.4], mark: { at: [-2.0, 3.4], text: '先に攻められる' } } ] },
+  ],
+  theory: '浮いたサービスは攻めるチャンス。前と後ろの間（サイドの中ほど）をねらう',
+  drill: 'サーバー役にわざと少し浮いたサービスを出してもらい、レシーバーはサイドの中ほどへプッシュ。コーンを置いて的にする。' },
+
+{ id: 'd08', mode: 'doubles', cat: 'ito', lv: 1, who: 'B', type: 'shot',
+  title: 'ネット前の浮いた球',
+  ask: '前衛の B は、どう打つ？',
+  scene: '相手のネット前の球が、白帯より高く浮いた。',
+  start: { A: [0.0, 2.1], B: [0.3, 4.9], C: [-0.5, 8.6], D: [0.8, 11.4] },
+  setup: [ { hit: 'C', shot: 'float', to: [0.4, 5.7], mv: { C: [-0.4, 8.4] } } ],
+  opts: [
+    { k: 'ア', at: [1.4, 9.5], ok: true, shot: 'push', label: '相手のいないところへ沈める',
+      why: '浮いた球は、上から下へたたく。高い打点でとらえて、相手のいないところへ沈める。',
+      then: [ { hit: 'B', shot: 'push', to: [1.4, 9.5], mv: { C: [0.2, 8.6] } } ] },
+    { k: 'イ', at: [0.6, 12.4], shot: 'lob', label: '奥へ高く上げる',
+      why: 'チャンスなのに上げると、相手のスマッシュから始まってしまう。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.6, 12.4] }, { hit: 'D', shot: 'smash', to: [-1.8, 3.0], mark: { at: [-1.8, 3.0], text: '先に攻められる' } } ] },
+    { k: 'ウ', at: [-0.3, 7.3], shot: 'net', label: 'ネット前に返す',
+      why: '返すだけでは、前にいる C にたたかれる。浮いた球は、待たずにたたく。',
+      then: [ { hit: 'B', shot: 'net', to: [-0.3, 7.3] }, { hit: 'C', shot: 'push', to: [-1.5, 3.8], mark: { at: [-1.5, 3.8], text: 'たたかれる' } } ] },
+  ],
+  think: ['打点：白帯より上。上から打てる', '相手：C は前、D は後ろ。C のいない側が空いている', 'だから：攻め。相手のいない所へ沈める'],
+  theory: '浮いた球は、上から下へ。前衛は高い打点でたたく',
+  drill: 'ネット前で、ノッカーが白帯より少し高い球を手で投げる。前衛はラケットを上げて待ち、小さく速く押しこむ。大きく振らない。' },
+
+{ id: 'd09', mode: 'doubles', cat: 'haikyu', lv: 2, who: 'A', type: 'shot',
+  title: '横並びの相手へのスマッシュ',
+  ask: 'A のスマッシュは、どこへ？',
+  scene: '相手が高く上げてきた。相手の C と D は横並びで守っている。',
+  start: { A: [0.3, 2.3], B: [0.2, 4.6], C: [-1.5, 10.6], D: [1.2, 9.2] },
+  setup: [ { hit: 'D', shot: 'lob', to: [0.2, 1.4], mv: { D: [1.5, 10.6] } } ],
+  opts: [
+    { k: 'ア', at: [0.0, 10.8], ok: true, shot: 'smash', label: '2人のまん中（センター）',
+      why: 'センターは、どちらが取るか迷いやすい。返球の角度もせまくなり、前衛の B が次をねらいやすい。',
+      then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.8], mv: { C: [-0.9, 10.6] } }, { hit: 'D', shot: 'block', to: [0.3, 5.3] }, { hit: 'B', shot: 'push', to: [-1.7, 9.4] } ] },
+    { k: 'イ', at: [2.85, 10.9], shot: 'smash', label: '右の相手の外側（サイドライン際）',
+      why: 'ライン際はアウトになりやすい。届いた相手は、クロスへ大きく振り返してくる。',
+      then: [ { hit: 'A', shot: 'smash', to: [2.85, 10.9] }, { hit: 'D', shot: 'drive', to: [-2.5, 3.4], mark: { at: [-2.5, 3.4], text: '振られる' } } ] },
+    { k: 'ウ', at: [0.0, 12.9], shot: 'clear', label: '奥へクリア',
+      why: '攻めの番を、自分から手放す。相手に上から打たせることになる。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.0, 12.9] }, { hit: 'C', shot: 'smash', to: [1.8, 3.3], mv: { A: [0.4, 2.6] }, mark: { at: [1.8, 3.3], text: '攻守交代' } } ] },
+  ],
+  think: ['打点：高い。後ろで余裕をもって打てる', '相手：横並び。2人の間が空いている', 'だから：攻め。センターへ'],
+  theory: '迷ったらセンター。2人の間は取り手が迷い、返球の角度もせまい',
+  drill: '守りの2人に、後衛役がセンターをねらって10本。前衛役は、返ってきた球を前でたたく。センターにコーンを置いて的にする。' },
+
+/* ----- ダブルス：形の切りかえ（v0.2 で追加。部で崩れやすい場面） ----- */
+{ id: 'd23', mode: 'doubles', cat: 'kirikae', lv: 1, who: 'A', type: 'move',
+  title: '上がってきたら縦の形へ',
+  ask: 'B が後ろで打つ。A はどこへ？',
+  scene: '横並び（サイドバイサイド）で守っていたら、相手が右奥へ高く返してきた。B が下がってスマッシュを打つ。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.6, 9.0], D: [0.6, 11.4] },
+  setup: [ { hit: 'D', shot: 'clear', to: [1.5, 1.2], mv: { C: [-1.3, 10.4], D: [1.3, 10.4] } } ],
+  opts: [
+    { k: 'ア', at: [0.3, 4.6], ok: true, label: '前（ショートサービスラインのあたり）へ',
+      why: '相方が後ろで打つなら、自分は前へ。横並びから縦の形（トップアンドバック）に変わる合図は「相手が上げてきたこと」。',
+      then: [ { hit: 'B', shot: 'smash', to: [1.3, 10.6], mv: { A: [0.3, 4.6] } }, { hit: 'D', shot: 'block', to: [0.8, 5.3] }, { hit: 'A', shot: 'push', to: [-1.8, 9.6] } ] },
+    { k: 'イ', at: [-1.3, 3.2], label: '左の中ほどのまま',
+      why: '横並びのままだと、ネット前に返された球に届かない。攻めているのに、前ががら空き。',
+      then: [ { hit: 'B', shot: 'smash', to: [1.3, 10.6], mv: { A: [-1.3, 3.2] } }, { hit: 'D', shot: 'block', to: [0.6, 5.5], mark: { at: [0.6, 5.5], text: '空く' } } ] },
+  ],
+  theory: '相手が上げてきたら縦の形へ。相方が後ろで打つなら、自分は前',
+  drill: '横並びの2人に、ノッカーがスマッシュ→クリアの順で出す。上がった側の人が後ろへ、もう1人は「前！」と言って前へ。左右を入れかえる。' },
+
+{ id: 'd24', mode: 'doubles', cat: 'kirikae', lv: 2, who: 'A', type: 'move',
+  title: 'ネット前に落としたら前へ',
+  ask: 'ネット前に落としたあと、A はどこへ？',
+  scene: '横並びで守っている。相手の D のスマッシュを、A が前衛 C のいない左のネット前へ落とす。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [0.8, 8.8], D: [-0.4, 11.0] },
+  setup: [ { hit: 'B', shot: 'lob', to: [-1.2, 12.0] }, { hit: 'D', shot: 'smash', to: [-1.3, 3.3] } ],
+  opts: [
+    { k: 'ア', at: [-0.7, 4.8], ok: true, label: '自分も前へ詰める（B は後ろへ）',
+      why: 'ネット前に落としたら、相手は下から打つしかない。落とした人がそのまま前へ、相方は後ろへ回って縦の形に。',
+      then: [ { hit: 'A', shot: 'block', to: [-1.0, 8.3], mv: { A: [-0.7, 4.8], B: [0.2, 2.2] } }, { hit: 'C', shot: 'net', to: [-0.6, 5.4] }, { hit: 'A', shot: 'push', to: [1.6, 9.4] } ] },
+    { k: 'イ', at: [-1.3, 3.3], label: 'その場で次を待つ',
+      why: '落としたあとに止まると、相手のネット前の返球に届かない。守りから攻めに変わるところを逃す。',
+      then: [ { hit: 'A', shot: 'block', to: [-1.0, 8.3], mv: { A: [-1.3, 3.3] } }, { hit: 'C', shot: 'net', to: [-0.6, 5.5], mark: { at: [-0.6, 5.5], text: '空く' } } ] },
+  ],
+  theory: '自分がネット前に落としたら、そのまま前へ。相方は後ろへ回る',
+  drill: 'スマッシュレシーブをネット前に落とす→そのまま前へ詰める、の2球セット。相方は「うしろ！」と言って後ろへ回る。' },
+
+{ id: 'd25', mode: 'doubles', cat: 'kirikae', lv: 2, who: 'B', type: 'move',
+  title: '後衛がクリアで返したら',
+  ask: '前衛の B は、どこへ？',
+  scene: '縦の形（トップアンドバック）で攻めていたが、相手のクリアで A が左奥に追いこまれ、クリアで返すしかない。',
+  start: { A: [0.4, 2.0], B: [0.2, 4.7], C: [-1.3, 10.4], D: [1.3, 10.4] },
+  setup: [ { hit: 'D', shot: 'clear', to: [-2.2, 0.6] } ],
+  opts: [
+    { k: 'ア', at: [1.3, 3.3], ok: true, label: '右の中ほどへ下がる（横並び）',
+      why: '後衛がクリアで上げたら、守りの番。前衛は下がって横並び（サイドバイサイド）に。A が左なら、B は右。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.4, 12.6], mv: { B: [1.3, 3.3], A: [-1.3, 3.0] } }, { hit: 'D', shot: 'smash', to: [1.4, 3.4] }, { hit: 'B', shot: 'block', to: [-1.5, 8.6] } ] },
+    { k: 'イ', at: [0.3, 4.8], label: '前に残る',
+      why: '前に残ると、右側を守る人がいない。スマッシュを打たれて届かない。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.4, 12.6], mv: { B: [0.3, 4.8], A: [-1.3, 3.0] } }, { hit: 'D', shot: 'smash', to: [1.6, 2.8], mark: { at: [1.6, 2.8], text: '空く' } } ] },
+    { k: 'ウ', at: [-0.4, 3.2], label: 'A と同じ左側へ下がる',
+      why: 'A と同じ側に下がると、2人が重なって反対側が空く。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.4, 12.6], mv: { B: [-0.4, 3.2], A: [-1.3, 3.0] } }, { hit: 'D', shot: 'smash', to: [1.7, 3.0], mark: { at: [1.7, 3.0], text: '空く' } } ] },
+  ],
+  theory: '自分たちが上げたら横並びへ。前衛は下がって、相方と反対側を守る',
+  drill: '縦の形で攻める2人に、ノッカーがときどき奥へクリアを出す。後衛がクリアで返したら、前衛は「サイド！」と言って下がる。' },
+
+{ id: 'd26', mode: 'doubles', cat: 'kirikae', lv: 3, who: 'A', type: 'move',
+  title: '前衛が上げたら、後衛は空いている側へ',
+  ask: '後ろの A は、どこへ？',
+  scene: '縦の形で攻めていたが、相手のクロスのブロックを B が左前で取り、ロブで上げるしかない。',
+  start: { A: [0.1, 1.9], B: [0.3, 4.7], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [1.4, 10.7] }, { hit: 'D', shot: 'block', to: [-1.3, 5.4] } ],
+  opts: [
+    { k: 'ア', at: [1.3, 3.3], ok: true, label: '右の中ほどへ',
+      why: 'B が左で上げたら、B は左の中ほどへ下がる。後ろの A は右の中ほどへ出て、横並び（サイドバイサイド）にする。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.4], mv: { A: [1.3, 3.3], B: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [1.4, 3.5] }, { hit: 'A', shot: 'block', to: [1.6, 8.7] } ] },
+    { k: 'イ', at: [0.1, 1.9], label: 'まん中の後ろのまま',
+      why: '後ろのまん中に残ると、縦の形のまま。右の中ほどにスマッシュを打たれて届かない。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.4], mv: { A: [0.1, 1.9], B: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [1.5, 3.6], mark: { at: [1.5, 3.6], text: '空く' } } ] },
+    { k: 'ウ', at: [-1.1, 2.6], label: '左のほう（B と同じ側）',
+      why: 'B と同じ側に寄ると、2人が重なって右が空く。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.4], mv: { A: [-1.1, 2.6], B: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [1.6, 3.2], mark: { at: [1.6, 3.2], text: '空く' } } ] },
+  ],
+  theory: '相方が上げたら、後衛は空いている側の中ほどへ。2人で横並びをつくる',
+  drill: '縦の形で攻める2人に、ノッカーが前衛の左右にブロックを出す。前衛がロブを上げたら、後衛は反対側の中ほどへ出る。' },
+
+{ id: 'd21', mode: 'doubles', cat: 'kirikae', lv: 2, who: 'B', type: 'move',
+  title: 'ドライブで抜いたら前へ',
+  ask: 'B は、どう動く？',
+  scene: '横並びで守っていた。B のドライブが相手の前衛 C の横を抜け、後ろの D が低い所で取る。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.4], C: [-0.6, 8.6], D: [0.6, 11.8] },
+  setup: [ { hit: 'D', shot: 'smash', to: [1.3, 3.4] }, { hit: 'B', shot: 'drive', to: [1.9, 10.4] } ],
+  opts: [
+    { k: 'ア', at: [0.6, 4.8], ok: true, label: '前へ詰める（A は後ろへ）',
+      why: '相手が下から打つしかないなら、攻めに変わるチャンス。B は前へ、A は後ろへ回って縦の形に。',
+      then: [ { hit: 'D', shot: 'block', to: [0.5, 5.4], mv: { B: [0.6, 4.8], A: [0.0, 2.4] } }, { hit: 'B', shot: 'push', to: [-2.0, 10.4] } ] },
+    { k: 'イ', at: [1.3, 3.4], label: '横並びのまま待つ',
+      why: '横並びのままだと、ネット前に落とされた球に届かない。攻めに変わるチャンスを逃す。',
+      then: [ { hit: 'D', shot: 'block', to: [0.4, 5.5], mv: { B: [1.3, 3.4] }, mark: { at: [0.4, 5.5], text: '空く' } } ] },
+  ],
+  theory: '相手に下から打たせたら、前へ出て縦の形に変える',
+  drill: 'スマッシュレシーブ→ドライブで抜く→前へ詰める、の3球。ノッカーは抜かれたら、ネット前に落とす。' },
+
+/* ----- ダブルス：前衛・立ち位置・レシーブ・サービス・配球（v0.2 で追加） ----- */
+{ id: 'd10', mode: 'doubles', cat: 'zenei', lv: 2, who: 'B', type: 'move',
+  title: '頭の上を越える球',
+  ask: '前衛の B は、どうする？',
+  scene: 'A のスマッシュを、相手の D が前衛 B の頭の上を越えるドライブで返してきた。',
+  start: { A: [0.3, 1.6], B: [0.3, 4.8], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [1.4, 10.7] } ],
+  opts: [
+    { k: 'ア', at: [0.4, 4.9], ok: true, label: '前にいたまま、A にまかせる',
+      why: '頭の上を越えた球は、後ろの A のほうが正面で打てる。前衛は追わずに、次のネット前を守る。',
+      then: [ { hit: 'D', shot: 'drive', to: [0.8, 3.2], mv: { B: [0.4, 4.9] } }, { hit: 'A', shot: 'drive', to: [-1.7, 9.6] } ] },
+    { k: 'イ', at: [0.7, 3.7], label: '下がって自分で打つ',
+      why: '下がりながら打つと球が弱くなり、前ががら空きになる。ネット前に落とされて届かない。',
+      then: [ { hit: 'D', shot: 'drive', to: [0.7, 3.7], mv: { B: [0.7, 3.7] } }, { hit: 'B', shot: 'half', to: [-1.2, 9.0] }, { hit: 'C', shot: 'push', to: [0.6, 5.6], mark: { at: [0.6, 5.6], text: '空く' } } ] },
+  ],
+  theory: '頭の上を越えた球は、後衛にまかせる。前衛は前を守る',
+  drill: '後衛役がスマッシュ、受け手は前衛の頭の上へドライブで返す。前衛は追わずに「まかせた！」と声を出し、次のネット前に備える。' },
+
+{ id: 'd11', mode: 'doubles', cat: 'zenei', lv: 2, who: 'B', type: 'move',
+  title: 'クロスのスマッシュのときの前衛',
+  ask: '前衛の B は、どこに構える？',
+  scene: 'A が右奥から、クロス（こちらから見て左）にスマッシュを打つ。',
+  start: { A: [1.4, 2.2], B: [0.0, 4.4], C: [-1.0, 9.0], D: [1.5, 10.6] },
+  setup: [ { hit: 'C', shot: 'lob', to: [1.7, 1.0], mv: { C: [-1.5, 10.6] } } ],
+  opts: [
+    { k: 'ア', at: [-0.9, 4.7], ok: true, label: '左前（シャトルが向かった側）',
+      why: 'シャトルが向かった側に寄る。クロスに打ったら、前衛も左へ。返ってくるのは、相手から見てストレートの球。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.5, 10.8], mv: { B: [-0.9, 4.7] } }, { hit: 'C', shot: 'block', to: [-1.0, 5.3] }, { hit: 'B', shot: 'push', to: [0.6, 9.2] } ] },
+    { k: 'イ', at: [1.0, 4.7], label: '右前（A のいる側）',
+      why: '打った A の側に残ると、相手のストレートの返球が来る左前が空く。寄るのは「打った人の側」ではなく「シャトルが向かった側」。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.5, 10.8], mv: { B: [1.0, 4.7] } }, { hit: 'C', shot: 'block', to: [-1.3, 5.4], mv: { B: [0.2, 5.0] }, mark: { at: [-1.3, 5.4], text: '空く' } } ] },
+    { k: 'ウ', at: [0.0, 2.8], label: 'まん中の後ろ',
+      why: '下がりすぎ。ネット前に落とされた球に届かない。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.5, 10.8], mv: { B: [0.0, 2.8] } }, { hit: 'C', shot: 'block', to: [-0.8, 5.6], mv: { B: [-0.4, 3.9] }, mark: { at: [-0.8, 5.6], text: '空く' } } ] },
+  ],
+  theory: 'クロスに打ったら、前衛もクロス側へ。寄るのはシャトルが向かった側',
+  drill: '後衛役がストレートとクロスを打ち分け、前衛役はシャトルが向かった側へ寄る。後衛役は打つ前に言わない。' },
+
+{ id: 'd12', mode: 'doubles', cat: 'zenei', lv: 1, who: 'B', type: 'move',
+  title: '前衛はネットにはりつかない',
+  ask: '前衛の B は、ネットからどれくらいの所に構える？',
+  scene: 'A が後ろからスマッシュで攻める。相手は横並びで守っている。',
+  start: { A: [0.3, 2.4], B: [0.2, 5.2], C: [-1.5, 10.5], D: [1.1, 9.2] },
+  setup: [ { hit: 'D', shot: 'lob', to: [0.2, 1.5], mv: { D: [1.5, 10.5] } } ],
+  opts: [
+    { k: 'ア', at: [0.2, 4.6], ok: true, label: 'ショートサービスラインのあたり',
+      why: 'ネットから一歩半。ここなら、ネット前の球にも、横を抜けるドライブにも手が届く。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.4, 10.7], mv: { B: [0.2, 4.6] } }, { hit: 'C', shot: 'drive', to: [-0.6, 4.5] }, { hit: 'B', shot: 'push', to: [0.9, 9.3] } ] },
+    { k: 'イ', at: [0.2, 6.0], label: 'ネットにはりつく',
+      why: 'ネットに近すぎると、横や頭の上を抜けるドライブに反応できない。見てから動く時間がない。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.4, 10.7], mv: { B: [0.2, 6.0] } }, { hit: 'C', shot: 'drive', to: [-0.7, 3.6], mv: { B: [-0.3, 5.6] }, mark: { at: [-0.7, 3.6], text: '抜かれる' } } ] },
+  ],
+  theory: '前衛はネットにはりつかない。ショートサービスラインのあたりで構える',
+  drill: '前衛役はショートサービスラインの上に立ち、ノッカーはネット前とドライブをまぜて出す。取れたら半歩前、取れなかったら半歩後ろで、自分の距離を探す。' },
+
+{ id: 'd13', mode: 'doubles', cat: 'katachi', lv: 2, who: 'A', type: 'move',
+  title: 'センターの球は誰が取る',
+  ask: '左にいる A は、どうする？',
+  scene: 'A と B は横並び（2人とも右利き）。相手の D が、2人のまん中（センター）にスマッシュを打つ。',
+  start: { A: [-1.4, 3.2], B: [1.3, 3.4], C: [-0.8, 9.4], D: [0.6, 11.0] },
+  setup: [ { hit: 'B', shot: 'lob', to: [0.2, 12.0], mv: { B: [1.4, 3.2] } } ],
+  opts: [
+    { k: 'ア', at: [-0.4, 3.1], ok: true, label: 'フォアで取りにいく',
+      why: '右利きどうしなら、センターは左の A のフォア側。取る人を決めておけば、お見合いにならない。',
+      then: [ { hit: 'D', shot: 'smash', to: [0.0, 3.0], mv: { A: [-0.4, 3.1] } }, { hit: 'A', shot: 'block', to: [1.6, 8.8] } ] },
+    { k: 'イ', at: [-1.6, 3.1], label: 'B にまかせて、その場で待つ',
+      why: 'まかせ合うと、お見合いで落ちる。B から見るとセンターはバック側で、取りにくい。',
+      then: [ { hit: 'D', shot: 'smash', to: [0.0, 3.0], mv: { A: [-1.6, 3.1], B: [0.9, 3.2] }, mark: { at: [0.0, 3.0], text: 'お見合い' } } ] },
+  ],
+  theory: 'センターは「フォアで取れる人」が取る。2人で先に決めておく',
+  drill: '横並びの2人に、ノッカーがセンターへ連続で打つ。取る人が「はい！」と声を出す。決めごと（フォアの人／前にいる人）は部でそろえる。' },
+
+{ id: 'd14', mode: 'doubles', cat: 'katachi', lv: 2, who: 'A', type: 'move',
+  title: 'スマッシュのあとの後衛',
+  ask: 'スマッシュを打ったあと、A はどこへ？',
+  scene: '縦の形で攻めている。後ろの A がスマッシュを打つ。前には B がいる。',
+  start: { A: [0.4, 2.4], B: [0.2, 4.7], C: [-1.0, 9.0], D: [1.5, 10.6] },
+  setup: [ { hit: 'C', shot: 'lob', to: [0.3, 1.3], mv: { C: [-1.5, 10.6] } } ],
+  opts: [
+    { k: 'ア', at: [0.3, 2.7], ok: true, label: '一歩前（中ほど）へ',
+      why: 'スマッシュの返球は、低いドライブで中ほどに返ってきやすい。打ったら一歩前に詰めて、次も上から打つ。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.5, 10.8], mv: { A: [0.3, 2.7] } }, { hit: 'D', shot: 'drive', to: [1.0, 3.3] }, { hit: 'A', shot: 'drive', to: [-1.8, 9.6] } ] },
+    { k: 'イ', at: [0.3, 1.0], label: '後ろに残る',
+      why: '後ろに残ると、前衛と後衛の間（中ほど）に返された球に間に合わない。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.5, 10.8], mv: { A: [0.3, 1.0] } }, { hit: 'D', shot: 'drive', to: [1.1, 3.4], mv: { A: [0.6, 2.0] }, mark: { at: [1.1, 3.4], text: '空く' } } ] },
+    { k: 'ウ', at: [-0.2, 4.0], label: 'B のすぐ後ろまで前へ',
+      why: '前に出すぎると、2人とも前になる。後ろに上げられると届かない。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.5, 10.8], mv: { A: [-0.2, 4.0] } }, { hit: 'D', shot: 'lob', to: [0.8, 0.8], mv: { A: [0.2, 2.6] }, mark: { at: [0.8, 0.8], text: '空く' } } ] },
+  ],
+  theory: 'スマッシュを打ったら、後衛も一歩前へ。前衛との間を空けない',
+  drill: 'スマッシュ→ドライブ返球の2球セット。後衛役はスマッシュのあと一歩前に出て、中ほどのドライブを前で打ち返す。' },
+
+{ id: 'd18', mode: 'doubles', cat: 'mamori', lv: 2, who: 'B', type: 'shot',
+  title: 'ドライブの打ち合い',
+  ask: 'B は、どう返す？',
+  scene: '横並びどうしのドライブの打ち合い。相手の D のドライブが B に来た。',
+  start: { A: [-1.3, 3.4], B: [1.3, 3.6], C: [-1.3, 10.0], D: [1.2, 10.0] },
+  setup: [ { hit: 'D', shot: 'drive', to: [1.3, 3.8] } ],
+  opts: [
+    { k: 'ア', at: [0.0, 9.6], ok: true, shot: 'drive', label: '低く速く、2人の間へ',
+      why: 'ドライブは低く速く。ネットすれすれで返せば、相手も下から打つしかない。ねらいは2人の間。',
+      then: [ { hit: 'B', shot: 'drive', to: [0.0, 9.6], mv: { C: [-0.8, 10.0], D: [0.8, 10.0] } } ] },
+    { k: 'イ', at: [1.0, 9.8], shot: 'half', label: 'ふわっと高めに返す',
+      why: '少しでも浮くと、相手に上からたたかれる。',
+      then: [ { hit: 'B', shot: 'half', to: [1.0, 9.8] }, { hit: 'D', shot: 'smash', to: [-0.1, 3.2], mark: { at: [-0.1, 3.2], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [0.6, 12.2], shot: 'lob', label: '奥へ高く上げて逃げる',
+      why: '逃げて上げると、相手のスマッシュから始まる。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.6, 12.2] }, { hit: 'D', shot: 'smash', to: [-2.0, 3.0], mark: { at: [-2.0, 3.0], text: '先に攻められる' } } ] },
+  ],
+  theory: 'ドライブは浮かさない。ネットすれすれで、2人の間へ',
+  drill: '半面2対2のドライブの打ち合い。白帯の上30cmにひもを張り、その下を通す。浮いた球は相手がたたいてよい。' },
+
+{ id: 'd19', mode: 'doubles', cat: 'mamori', lv: 2, who: 'B', type: 'shot',
+  title: 'スマッシュレシーブの返し先',
+  ask: 'B は、スマッシュをどこへ返す？',
+  scene: '相手は縦の形。前衛の C は左側（こちらから見て）にいて、後ろの D のスマッシュが B に来た。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.8, 8.8], D: [0.8, 10.6] },
+  setup: [ { hit: 'B', shot: 'lob', to: [1.4, 12.0] }, { hit: 'D', shot: 'smash', to: [1.3, 3.4] } ],
+  opts: [
+    { k: 'ア', at: [1.2, 8.2], ok: true, shot: 'block', label: '前衛のいない右のネット前へ',
+      why: '前衛 C のいない側のネット前へ。D は後ろにいるので、前に落とせば2人とも遠い。',
+      then: [ { hit: 'B', shot: 'block', to: [1.2, 8.2], mv: { C: [0.2, 8.6] } } ] },
+    { k: 'イ', at: [-0.6, 8.2], shot: 'net', label: '前衛の正面のネット前へ',
+      why: '前衛の正面に返すと、そのままたたかれる。',
+      then: [ { hit: 'B', shot: 'net', to: [-0.6, 8.2] }, { hit: 'C', shot: 'push', to: [0.1, 4.5], mark: { at: [0.1, 4.5], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [-0.6, 10.2], shot: 'half', label: '前衛の頭の上へ、ふわっと',
+      why: '中途半端な高さは、前衛にジャンプしてたたかれる。',
+      then: [ { hit: 'B', shot: 'half', to: [-0.7, 9.4] }, { hit: 'C', shot: 'smash', to: [0.1, 3.3], mark: { at: [0.1, 3.3], text: 'たたかれる' } } ] },
+  ],
+  theory: 'スマッシュレシーブは、相手の前衛がいない側へ',
+  drill: 'スマッシュレシーブ練習。相手の前衛役は左右どちらかに立ち、レシーバーは前衛のいない側のネット前へ返す。前衛役は立つ側を毎回変える。' },
+
+{ id: 'd15', mode: 'doubles', cat: 'serve', lv: 1, who: 'B', type: 'move',
+  title: 'ダブルスのレシーブの構え',
+  ask: 'レシーバーの B は、どこに構える？',
+  scene: '相手の C がショートサービスを打つ。B がレシーブする。',
+  start: { A: [-0.9, 2.4], B: [0.9, 3.0], C: [-0.45, 9.1], D: [0.3, 11.2] },
+  sh: [-0.45, 9.1, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [0.55, 4.45], ok: true, label: 'ショートサービスラインのすぐ後ろ',
+      why: 'ダブルスはショートサービスが中心。前で構えると、ネットを越えたところをたたける。',
+      then: [ { mv: { B: [0.55, 4.45] }, t: 0.4 }, { hit: 'C', shot: 'sshort', to: [0.4, 5.2], end: 1.5 }, { hit: 'B', shot: 'push', to: [1.9, 10.2] } ] },
+    { k: 'イ', at: [0.55, 3.0], label: 'コートのまん中',
+      why: 'まん中で待つと、ショートサービスを低い所で取ることになり、上げるしかなくなる。',
+      then: [ { mv: { B: [0.55, 3.0] }, t: 0.4 }, { hit: 'C', shot: 'sshort', to: [0.3, 4.4], end: 0.4 }, { hit: 'B', shot: 'lob', to: [0.4, 11.6] }, { hit: 'D', shot: 'smash', to: [1.9, 2.9], mark: { at: [1.9, 2.9], text: '先に攻められる' } } ] },
+    { k: 'ウ', at: [0.55, 1.4], label: '後ろのほう',
+      why: '後ろすぎると、ショートサービスに届かない。',
+      then: [ { mv: { B: [0.55, 1.4] }, t: 0.4 }, { hit: 'C', shot: 'sshort', to: [0.3, 4.4], mv: { B: [0.45, 2.9] }, mark: { at: [0.3, 4.4], text: '届かない' } } ] },
+  ],
+  theory: 'ダブルスのレシーブは前寄り。ショートサービスラインのすぐ後ろで構える',
+  drill: 'レシーブ練習。ショートサービスラインから足1つ後ろに立ち、ショートサービスを5本続けてプッシュ。ときどきロングもまぜてもらう。' },
+
+{ id: 'd16', mode: 'doubles', cat: 'serve', lv: 1, who: 'A', type: 'move',
+  title: 'ショートサービスのあとのサーバー',
+  ask: 'サービスを打ったあと、A はどこへ？',
+  scene: 'A がショートサービスを打つ。パートナーの B は後ろのまん中にいる。',
+  start: { A: [0.45, 4.3], B: [0.0, 2.4], C: [-0.7, 9.3], D: [0.9, 11.3] },
+  sh: [0.45, 4.3, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [0.3, 4.6], ok: true, label: 'そのまま前に残る',
+      why: '打ったら前に残り、ラケットを上げる。ネット前に返された球を、上からたたける。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { A: [0.3, 4.6] } }, { hit: 'C', shot: 'net', to: [0.1, 5.3] }, { hit: 'A', shot: 'push', to: [-1.6, 10.2] } ] },
+    { k: 'イ', at: [0.4, 3.0], label: '後ろへ下がる',
+      why: '下がると、ネット前が空く。ネット前に返されると届かない。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { A: [0.4, 3.0] } }, { hit: 'C', shot: 'net', to: [0.2, 5.5], mv: { A: [0.3, 4.2] }, mark: { at: [0.2, 5.5], text: '空く' } } ] },
+    { k: 'ウ', at: [1.6, 4.4], label: '右の外側へ寄る',
+      why: '外に寄ると、まん中と反対側のネット前が空く。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { A: [1.6, 4.4] } }, { hit: 'C', shot: 'net', to: [-0.6, 5.5], mv: { A: [0.9, 4.8] }, mark: { at: [-0.6, 5.5], text: '空く' } } ] },
+  ],
+  theory: 'サーバーは打ったら前に残る。ラケットを上げて次を待つ',
+  drill: 'サービスを打ったら、ラケットを上げたまま前で構え、相手のネット前の返球をたたく。サーバーとパートナーを交代で5本。' },
+
+{ id: 'd17', mode: 'doubles', cat: 'serve', lv: 2, who: 'A', type: 'move',
+  title: 'ロングサービスを受けたら',
+  ask: 'パートナーの A は、どこへ？',
+  scene: '相手のロングサービスを、レシーバーの B が下がってスマッシュで打つ。',
+  start: { A: [-0.9, 2.6], B: [0.5, 4.4], C: [-0.45, 9.1], D: [0.3, 11.2] },
+  sh: [-0.45, 9.1, 1.0],
+  setup: [ { hit: 'C', shot: 'slong', to: [0.9, 1.1], mv: { C: [-1.3, 10.5], D: [1.3, 10.5] } } ],
+  opts: [
+    { k: 'ア', at: [-0.1, 4.6], ok: true, label: '前（ショートサービスラインのあたり）へ',
+      why: 'パートナーが後ろから打つなら、自分は前へ。縦の形で、返ってきたネット前をたたく。',
+      then: [ { hit: 'B', shot: 'smash', to: [1.3, 10.6], mv: { A: [-0.1, 4.6] } }, { hit: 'D', shot: 'block', to: [0.3, 5.3] }, { hit: 'A', shot: 'push', to: [-1.6, 9.4] } ] },
+    { k: 'イ', at: [-1.3, 2.4], label: '左の後ろに残る',
+      why: '2人とも後ろにいると、ネット前に落とされて届かない。',
+      then: [ { hit: 'B', shot: 'smash', to: [1.3, 10.6], mv: { A: [-1.3, 2.4] } }, { hit: 'D', shot: 'block', to: [0.2, 5.5], mark: { at: [0.2, 5.5], text: '空く' } } ] },
+  ],
+  theory: 'パートナーが後ろで打つなら、自分は前へ。攻めは縦の形',
+  drill: 'ロングサービス→レシーバーが後ろから打つ→パートナーが前へ、の3球。サーバー役はショートとロングをまぜる。' },
+
+{ id: 'd22', mode: 'doubles', cat: 'serve', lv: 3, who: 'A', type: 'shot',
+  title: '前に詰めてくる相手へのサービス',
+  ask: 'A は、どこへサービスを打つ？',
+  scene: 'レシーバーの C は、ショートサービスラインぎりぎりまで前に詰めて、プッシュをねらっている。',
+  start: { A: [0.45, 4.3], B: [0.0, 2.4], C: [-0.5, 8.85], D: [0.9, 11.3] },
+  sh: [0.45, 4.3, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [-1.3, 12.4], ok: true, shot: 'slong', label: 'ロング（フリック）で頭の上を越す',
+      why: '前に詰めすぎた相手には、ロングで頭の上を越す。相手は下がりながら、苦しい体勢で打つことになる。同じ構えから打つのがコツ。',
+      then: [ { hit: 'A', shot: 'slong', to: [-1.3, 12.4], a: 2.4, t: 1.15 }, { hit: 'C', shot: 'half', to: [0.3, 2.6] }, { hit: 'B', shot: 'smash', to: [0.2, 10.4], mv: { C: [-1.3, 10.6], D: [1.3, 10.6] } } ] },
+    { k: 'イ', at: [-0.3, 8.95], shot: 'sshort', label: 'いつもどおりショート',
+      why: '待ちかまえている相手にショートを打つと、プッシュでたたかれる。ショートが基本でも、相手を見て変える。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95] }, { hit: 'C', shot: 'push', to: [1.3, 3.0], mark: { at: [1.3, 3.0], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [-1.0, 10.6], shot: 'shalf', label: '中途半端な高さで中ほどへ',
+      why: '中途半端な高さは、いちばんたたかれやすい。',
+      then: [ { hit: 'A', shot: 'shalf', to: [-1.0, 10.6] }, { hit: 'C', shot: 'smash', to: [0.9, 3.4], mark: { at: [0.9, 3.4], text: 'たたかれる' } } ] },
+  ],
+  theory: '相手が前に詰めすぎていたら、ロング（フリック）をまぜる',
+  drill: 'レシーバー役がわざと前に詰める。サーバーは構えを見て、ショートとロングを打ち分ける。どちらも同じ構えから打つ。' },
+
+{ id: 'd20', mode: 'doubles', cat: 'haikyu', lv: 1, who: 'B', type: 'shot',
+  title: '上げるならどこへ',
+  ask: 'B は、どこへ上げる？',
+  scene: '相手のヘアピンを、前衛の B はロブで上げるしかない。相手は右利き。',
+  start: { A: [0.0, 2.2], B: [0.4, 4.6], C: [-0.6, 8.6], D: [0.4, 11.4] },
+  setup: [ { hit: 'C', shot: 'net', to: [0.9, 5.6] } ],
+  opts: [
+    { k: 'ア', at: [2.3, 13.0], ok: true, shot: 'lob', label: '深く、相手のバック奥（右奥）へ',
+      why: '上げるなら、深く、相手のバック奥へ。右利きの相手は、バック奥からは強く打ちにくい。',
+      then: [ { hit: 'B', shot: 'lob', to: [2.3, 13.0], mv: { B: [1.3, 3.3], A: [-1.3, 3.3], C: [-1.2, 9.6] } }, { hit: 'D', shot: 'half', to: [-0.6, 3.4], end: 2.6, mv: { A: [-0.6, 3.4] }, mark: { at: [2.3, 13.0], text: '苦しい' } } ] },
+    { k: 'イ', at: [0.4, 10.8], shot: 'half', label: '中ほどへ浅く',
+      why: '浅いロブは、ネットの近くからたたかれる。上げるなら奥まで。',
+      then: [ { hit: 'B', shot: 'half', to: [0.4, 10.8], mv: { B: [1.3, 3.3], A: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [0.0, 3.2], mark: { at: [0.0, 3.2], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [-2.3, 13.0], shot: 'lob', label: '相手のフォア奥（左奥）へ',
+      why: 'フォア奥は、相手がいちばん強く打てる場所。角度のついたスマッシュが来る。',
+      then: [ { hit: 'B', shot: 'lob', to: [-2.3, 13.0], mv: { B: [1.3, 3.3], A: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [-2.6, 2.6], mark: { at: [-2.6, 2.6], text: '強く打たれる' } } ] },
+  ],
+  theory: '上げるなら深く。ねらうのは相手のバック奥',
+  drill: 'ロブ10本。相手のバック奥（ダブルスのロングサービスラインより後ろ）にかごを置き、入った本数を数える。' },
+
+/* ----- ダブルス：考えて打つ（v0.3 で追加。「とりあえず返す」でチャンスボールをあげない） ----- */
+{ id: 'd27', mode: 'doubles', cat: 'ito', lv: 2, who: 'B', type: 'shot',
+  title: '腰の高さの球',
+  ask: 'B は、どう返す？',
+  scene: '横並びで守っている。相手は縦の形で、前衛の C は左寄り（こちらから見て）。後ろの D の球が、B の腰の高さに来た。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.4], C: [-0.6, 8.6], D: [0.4, 11.2] },
+  setup: [ { hit: 'B', shot: 'lob', to: [0.3, 11.8] }, { hit: 'D', shot: 'smash', to: [1.2, 3.6], end: 1.0, t: 0.7 } ],
+  think: ['打点：腰の高さ。上からは打てないが、低すぎもしない', '相手：前衛 C は左、後ろの D はまん中。右の中ほどが空いている', 'だから：崩す。低く速く、空いている所へ通す'],
+  opts: [
+    { k: 'ア', at: [1.9, 10.0], ok: true, shot: 'drive', label: '低く速く、前衛のいない右の中ほどへ',
+      why: '腰の高さの球は、低く速く返すのがはっきりした答え。前衛のいない側の中ほどへ通せば、相手は下から取るしかない。',
+      then: [ { hit: 'B', shot: 'drive', to: [1.9, 10.0], mv: { D: [1.1, 10.8], C: [0.0, 8.8] } } ] },
+    { k: 'イ', at: [0.2, 10.6], shot: 'half', label: 'とりあえず、ふわっと上げる',
+      why: 'ふわっと上げると、相手の後衛がいちばん打ちやすい高さになる。チャンスボールをあげてしまう。',
+      then: [ { hit: 'B', shot: 'half', to: [0.2, 10.4] }, { hit: 'D', shot: 'smash', to: [0.0, 3.2], mark: { at: [0.0, 3.2], text: 'チャンスボール' } } ] },
+    { k: 'ウ', at: [-0.3, 7.8], shot: 'drive', label: 'とりあえず、来た方向（前衛の正面）へ返す',
+      why: '来た方向へそのまま返すと、待っている前衛にたたかれる。',
+      then: [ { hit: 'B', shot: 'drive', to: [-0.3, 7.9] }, { hit: 'C', shot: 'push', to: [0.1, 4.6], mark: { at: [0.1, 4.6], text: 'たたかれる' } } ] },
+  ],
+  theory: '腰の高さの球は、低く速く、空いている所へ。ふわっと上げない',
+  drill: '2対2の守りの練習。相手の後衛役は腰の高さの球を打ち、守りは前衛のいない側へ低く返す。ふわっと上がったら、相手はスマッシュしてよい。' },
+
+{ id: 'd28', mode: 'doubles', cat: 'ito', lv: 2, who: 'B', type: 'shot',
+  title: '前衛が白帯より下で取ったら',
+  ask: '前衛の B は、どう打つ？',
+  scene: 'A のスマッシュを、相手の D が白帯すれすれにブロック。前衛の B は白帯よりずっと下で取る。相手は2人とも後ろにいる。',
+  start: { A: [0.2, 1.6], B: [0.2, 4.7], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [1.4, 10.7] }, { hit: 'D', shot: 'block', to: [0.6, 5.7], end: 0.3 } ],
+  think: ['打点：白帯よりずっと下。上からは打てない', '相手：2人とも後ろ。ネット前が空いている', 'だから：崩す。白帯すれすれに沈めて、相手に上げさせる'],
+  opts: [
+    { k: 'ア', at: [0.9, 7.2], ok: true, shot: 'net', label: '白帯すれすれのヘアピン',
+      why: '白帯より下で取ったら、たたけない。白帯すれすれに沈めれば、後ろの相手は前へ走って下から上げるしかない。攻めが続く。',
+      then: [ { hit: 'B', shot: 'net', to: [0.9, 7.2] }, { hit: 'D', shot: 'lob', to: [-0.2, 1.8] }, { hit: 'A', shot: 'smash', to: [-0.2, 10.6], mv: { C: [-1.3, 10.6], D: [1.3, 10.6] } } ] },
+    { k: 'イ', at: [1.3, 9.8], shot: 'drive', label: 'とりあえず強くたたこうとする',
+      why: '白帯より下から強く打つと、球が上に浮く。相手のチャンスボールになる。',
+      then: [ { hit: 'B', shot: 'drive', to: [1.3, 10.2] }, { hit: 'D', shot: 'smash', to: [-0.6, 3.4], mark: { at: [-0.6, 3.4], text: 'チャンスボール' } } ] },
+    { k: 'ウ', at: [0.3, 12.6], shot: 'lob', label: 'とりあえず奥へ上げる',
+      why: '上げると、攻めていたのに守りに変わってしまう。上げるしかない場面ではない。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.6], mv: { B: [1.2, 3.3], A: [-1.2, 3.3] } }, { hit: 'C', shot: 'smash', to: [0.0, 3.3], mark: { at: [0.0, 3.3], text: '攻守が入れかわる' } } ] },
+  ],
+  theory: '前衛が白帯より下で取ったら、沈めて相手に上げさせる',
+  drill: 'ノッカーが白帯すれすれのブロックと、浮いた球をまぜて出す。前衛は打つ前に「上！」「下！」と声に出す。上ならプッシュ、下ならヘアピン。' },
+
+/* ----- ダブルス：組み立て（v0.4 で追加。相手の寄り方・下がり方を見て次を決める） ----- */
+{ id: 'd29', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'A', type: 'shot',
+  title: 'スマッシュで下げたら、ドロップで前',
+  ask: 'A の次の1本は？',
+  scene: 'A のスマッシュを2本続けたら、相手は2人とも後ろに下がって守るようになった。また上がってきた。',
+  start: { A: [0.3, 2.0], B: [0.2, 4.7], C: [-1.4, 11.4], D: [1.4, 11.4] },
+  setup: [ { hit: 'A', shot: 'smash', to: [1.4, 11.5] }, { hit: 'D', shot: 'lob', to: [-0.2, 1.6], mv: { D: [1.4, 11.6] } }, { hit: 'A', shot: 'smash', to: [-1.4, 11.5] }, { hit: 'C', shot: 'lob', to: [0.3, 1.7], mv: { C: [-1.4, 11.7] } } ],
+  think: ['打点：高い。後ろで余裕をもって打てる', '相手：2人とも後ろに下がっている。ネット前が空いている', 'だから：崩す。前へ落として、下から打たせる'],
+  opts: [
+    { k: 'ア', at: [-0.6, 8.6], ok: true, shot: 'drop', label: 'ドロップで前へ落とす',
+      why: 'スマッシュで相手を下げたら、次はドロップで前へ。後ろに下がった相手は前まで走り、下から上げるしかない。上がった球をまた攻める。',
+      then: [ { hit: 'A', shot: 'drop', to: [-0.6, 8.6], end: 0.3 }, { hit: 'C', shot: 'lob', to: [0.2, 2.6] }, { hit: 'A', shot: 'smash', to: [0.3, 9.8], mv: { C: [-1.2, 10.4] } } ] },
+    { k: 'イ', at: [1.2, 10.6], shot: 'smash', label: 'もう一度、同じ所へスマッシュ',
+      why: '同じ所に同じ球を続けると、相手はなれて、強く返してくる。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.3, 10.9] }, { hit: 'D', shot: 'drive', to: [-1.8, 3.0], mark: { at: [-1.8, 3.0], text: 'なれて返される' } } ] },
+    { k: 'ウ', at: [0.0, 12.9], shot: 'clear', label: '奥へクリア',
+      why: '攻めているのにクリアを打つと、攻める番を手放す。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.0, 12.9] }, { hit: 'C', shot: 'smash', to: [1.7, 3.2], mark: { at: [1.7, 3.2], text: '攻守交代' } } ] },
+  ],
+  theory: 'スマッシュで下げたら、ドロップで前へ。前後に崩す',
+  drill: '後衛役は「スマッシュ→スマッシュ→ドロップ」の順で攻める。守りの2人が前に出てきたら、次はまたスマッシュ。' },
+
+{ id: 'd30', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'A', type: 'shot',
+  title: 'センターで寄せたら、サイドへ',
+  ask: 'A のスマッシュは、どこへ？',
+  scene: 'A がセンターにスマッシュを打ったら、相手の2人がまん中に寄ってきた。また上がってきた。',
+  start: { A: [0.3, 2.0], B: [0.2, 4.7], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [0.0, 10.7], mv: { C: [-0.6, 10.8] } }, { hit: 'D', shot: 'lob', to: [0.3, 1.6], mv: { D: [0.6, 10.9] } } ],
+  think: ['打点：高い。後ろで余裕をもって打てる', '相手：2人ともまん中に寄っている。両サイドが空いている', 'だから：攻め。空いたサイドの、線の内側へ'],
+  opts: [
+    { k: 'ア', at: [2.0, 11.2], ok: true, shot: 'smash', label: 'サイド（線の内側）へ',
+      why: 'センターで2人を寄せたら、次は空いたサイドへ。ただしラインぎりぎりではなく、内側をねらう。',
+      then: [ { hit: 'A', shot: 'smash', to: [2.0, 11.2], mv: { D: [1.4, 10.9] } } ] },
+    { k: 'イ', at: [0.0, 10.1], shot: 'smash', label: 'もう一度センターへ',
+      why: '同じセンターに続けると、寄ってきた2人に待たれている。',
+      then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.3] }, { hit: 'C', shot: 'drive', to: [-1.7, 3.2], mark: { at: [-1.7, 3.2], text: '待たれている' } } ] },
+    { k: 'ウ', at: [3.0, 10.3], shot: 'smash', label: 'サイドラインぎりぎり',
+      why: 'ラインぎりぎりは、少しずれるとアウト。自分のミスで点をあげてしまう。',
+      then: [ { hit: 'A', shot: 'smash', to: [3.2, 10.4], out: true, mv: { D: [1.6, 10.6] }, mark: { at: [3.2, 10.4], text: 'アウト' } } ] },
+  ],
+  theory: 'センターで寄せたら、空いたサイドへ（線の内側）',
+  drill: '後衛役は「センター→サイド」の2本セット。守りの2人は、センターに来たら寄る。サイドの内側にコーンを置いて的にする。' },
+
+{ id: 'd31', mode: 'doubles', cat: 'kumitate', lv: 3, who: 'A', type: 'shot',
+  title: 'ストレートを続けて、クロスで逆をつく',
+  ask: 'A の次のスマッシュは、どこへ？',
+  scene: 'A が右奥からストレート（D）へスマッシュを続けたら、左の C が D を助けようと、まん中に寄ってきた。',
+  start: { A: [1.5, 1.8], B: [0.9, 4.7], C: [-1.4, 10.6], D: [1.5, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [1.6, 10.8] }, { hit: 'D', shot: 'lob', to: [1.6, 1.2], mv: { C: [-0.7, 10.6] } } ],
+  think: ['打点：高い。右奥から余裕をもって打てる', '相手：右の D は待ちかまえている。左の C はまん中に寄り、左のサイドが空いた', 'だから：攻め。クロスの左サイドへ（前衛の B もクロス側へ寄る）'],
+  opts: [
+    { k: 'ア', at: [-2.2, 11.0], ok: true, shot: 'smash', label: 'クロスの左サイドへ',
+      why: 'ストレートを続けると、もう1人が助けに寄ってくる。寄った分だけ反対のサイドが空く。そこへクロス。打ったら前衛 B もクロス側へ寄る。',
+      then: [ { hit: 'A', shot: 'smash', to: [-2.2, 11.0], mv: { B: [-0.6, 4.7], C: [-1.0, 10.7] } } ] },
+    { k: 'イ', at: [1.4, 9.9], shot: 'smash', label: 'もう一度ストレート（D）へ',
+      why: '何本も同じ所に打つと、D は待ちかまえて返してくる。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.5, 10.3] }, { hit: 'D', shot: 'block', to: [-1.2, 5.4], mark: { at: [-1.2, 5.4], text: '待たれている' } } ] },
+    { k: 'ウ', at: [-0.4, 9.9], shot: 'smash', label: 'まん中（センター）へ',
+      why: 'ふだんはセンターがいいが、いまは C がまん中に寄っている。相手が寄った所に打ってしまう。',
+      then: [ { hit: 'A', shot: 'smash', to: [-0.5, 10.2] }, { hit: 'C', shot: 'drive', to: [-1.8, 3.2], mark: { at: [-1.8, 3.2], text: '寄った所に打った' } } ] },
+  ],
+  theory: '同じ所を続けて相手を寄せたら、空いた反対側をつく',
+  drill: '後衛役はストレートを2〜3本続けてからクロスへ。守りの2人は寄りすぎないように声をかけ合う。前衛役はクロスに打ったらクロス側へ寄る。' },
+
+{ id: 'd38', mode: 'doubles', cat: 'kumitate', lv: 1, who: 'A', type: 'plan',
+  title: '後衛が崩して、前衛が決める',
+  ask: 'どんな順番で決める？',
+  scene: '縦の形（トップアンドバック）で攻めている。A は右奥で、相手が上げてきた球を打つ。前衛の B は右前にいる。',
+  start: { A: [1.4, 2.0], B: [0.8, 4.7], C: [-1.4, 10.6], D: [1.2, 9.4] },
+  setup: [ { hit: 'D', shot: 'lob', to: [1.5, 1.2], mv: { D: [1.5, 10.6] } } ],
+  think: ['打点：高い。右奥で余裕をもって打てる', '相手：横並びで守っている。前衛の B が右前で待っている', 'だから：崩す。後衛は崩して、前衛が決める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① A：ストレートへスマッシュで崩す → ② 甘い返球を、前衛の B がたたく',
+      why: 'ダブルスの攻めは2人で組み立てる。後衛は角度と速さで崩し、浮いた返球を前衛が決める。後衛が1本で決めなくていい。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.5, 10.8] }, { hit: 'D', shot: 'block', to: [0.9, 5.3] }, { hit: 'B', shot: 'push', to: [-0.6, 9.2] } ] },
+    { k: 'イ', label: '① A：1本で決めようと、サイドラインぎりぎりへ',
+      why: '1本で決めようとすると、ラインを外れやすい。崩す役と決める役を分ける。',
+      then: [ { hit: 'A', shot: 'smash', to: [3.2, 10.6], out: true, mv: { D: [2.2, 10.6] }, mark: { at: [3.2, 10.6], text: 'アウト' } } ] },
+    { k: 'ウ', label: '① A：クリアで奥へつなぐ',
+      why: '攻めているのにクリアでつなぐと、攻める番を手放す。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.0, 12.9] }, { hit: 'C', shot: 'smash', to: [-1.7, 3.2], mark: { at: [-1.7, 3.2], text: '攻守交代' } } ] },
+  ],
+  theory: '後衛が崩して、前衛が決める。2人で組み立てる',
+  drill: '後衛役はスマッシュとドロップで「崩す」、前衛役は浮いた球だけを「決める」。前衛が決めたら1点。後衛が直接決めても点にしない。' },
+
+{ id: 'd39', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'B', type: 'plan',
+  title: 'レシーブから攻めの形を作る',
+  ask: 'どんな順番で攻める？',
+  scene: '相手のショートサービスが少し浮いた。サーバーの C は前、D は後ろ。レシーブから攻めの形を作りたい。',
+  start: { A: [-0.1, 2.3], B: [0.5, 4.5], C: [-0.4, 9.1], D: [0.2, 11.3] },
+  sh: [-0.4, 9.1, 1.0],
+  setup: [ { hit: 'C', shot: 'float', to: [0.45, 4.9], mv: { C: [-0.3, 8.9] } } ],
+  think: ['打点：白帯より上。上から打てる', '相手：C は前、D は後ろ。2人の間のサイドが空いている', 'だから：崩す。前と後ろの間へ沈めて上げさせ、3球目から攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① B：サイドの中ほどへプッシュ → ② 上がってきた球を A が後ろから攻める（B は前に残る）',
+      why: 'レシーブで相手に下から打たせれば、3球目からこちらの攻め。B は前に残り、A が後ろから打つ縦の形になる。',
+      then: [ { hit: 'B', shot: 'push', to: [1.9, 10.3], end: 0.4 }, { hit: 'D', shot: 'lob', to: [0.1, 1.8], mv: { B: [0.4, 4.8] } }, { hit: 'A', shot: 'smash', to: [-0.4, 10.4], mv: { C: [-1.3, 10.6], D: [1.3, 10.6] } } ] },
+    { k: 'イ', label: '① B：奥へ高く上げる → ② 横並びで守る',
+      why: '浮いた球を上げると、相手のスマッシュから始まる。攻めるチャンスを捨てている。',
+      then: [ { hit: 'B', shot: 'lob', to: [0.3, 12.5], mv: { B: [1.3, 3.3], A: [-1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [0.0, 3.3], mark: { at: [0.0, 3.3], text: '守りから始まる' } } ] },
+    { k: 'ウ', label: '① B：サーバーの正面へネット前',
+      why: '前で待つサーバーの正面は、そのままたたかれる。',
+      then: [ { hit: 'B', shot: 'net', to: [-0.3, 8.0] }, { hit: 'C', shot: 'push', to: [-1.9, 3.9], mark: { at: [-1.9, 3.9], text: 'たたかれる' } } ] },
+  ],
+  theory: 'レシーブで下から打たせて、3球目から攻める',
+  drill: 'サービス→レシーブ→3球目の3本セット。レシーバーはサイドの中ほどへ沈め、3球目はパートナーが後ろから打つ。' },
+
+{ id: 'd40', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: '守りから攻めに変える',
+  ask: 'どんな順番で、攻めに変える？',
+  scene: '横並びで守っている。相手は縦の形で、前衛の C は左寄り（こちらから見て）。D のスマッシュが A に来た。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.6, 8.6], D: [0.4, 11.2] },
+  setup: [ { hit: 'B', shot: 'lob', to: [0.3, 11.8] }, { hit: 'D', shot: 'smash', to: [-1.3, 3.4] } ],
+  think: ['打点：胸の高さ。上からは打てないが、低く速く返せる', '相手：前衛 C は左寄り、後ろの D はまん中。右の中ほどが空いている', 'だから：崩す。低く通して下から打たせ、上がったら縦の形で攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① A：低いドライブで前衛の横を抜く → ② 上がってきたら、縦の形で攻める',
+      why: '守りでも、低く通せば相手は下から打つしかない。上がってきたら、すぐに縦の形（相方が後ろ、自分は前）で攻める。',
+      then: [ { hit: 'A', shot: 'drive', to: [1.9, 10.2], end: 0.4 }, { hit: 'D', shot: 'lob', to: [1.4, 1.4], mv: { A: [-0.3, 4.6] } }, { hit: 'B', shot: 'smash', to: [-0.4, 10.4], mv: { C: [-1.3, 10.6], D: [1.3, 10.6] } } ] },
+    { k: 'イ', label: '① A：ロブで高く上げる → ② また横並びで守る',
+      why: '高く上げ続けると、守りがずっと続く。いつか打ちこまれる。',
+      then: [ { hit: 'A', shot: 'lob', to: [-0.3, 12.4] }, { hit: 'D', shot: 'smash', to: [1.4, 3.4] }, { hit: 'B', shot: 'lob', to: [0.4, 12.4], end: 3.0, mv: { D: [0.4, 12.4] }, mark: { at: [0.4, 12.4], text: '守りが続く' } } ] },
+    { k: 'ウ', label: '① A：前衛の正面へ返す',
+      why: '前衛の正面に返すと、そのままたたかれる。',
+      then: [ { hit: 'A', shot: 'drive', to: [-0.6, 8.0] }, { hit: 'C', shot: 'push', to: [0.2, 4.6], mark: { at: [0.2, 4.6], text: 'たたかれる' } } ] },
+  ],
+  theory: '守りでも低く通して、下から打たせたら攻めに変える',
+  drill: '守りの2人に、ノッカーがスマッシュを打つ。レシーブで前衛の横を抜けたら「前！」「うしろ！」と声を出して縦の形に変え、次の球を攻める。' },
+
+{ id: 'd41', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'A', type: 'shot',
+  title: 'ドロップで寄せたら、スマッシュ',
+  ask: 'A の次の1本は？',
+  scene: 'A のドロップで、相手の2人は前に出てきた。C が浅いロブを上げた。',
+  start: { A: [0.3, 2.0], B: [0.2, 4.7], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'drop', to: [-0.8, 8.8], end: 0.4, mv: { D: [0.9, 9.6] } }, { hit: 'C', shot: 'lob', to: [0.3, 2.2], mv: { C: [-0.9, 9.6] } } ],
+  think: ['打点：高い。後ろで余裕をもって打てる', '相手：2人とも前に出ている。反応する時間が短い', 'だから：攻め。前に出た2人の間へ、スマッシュ'],
+  opts: [
+    { k: 'ア', at: [0.0, 10.0], ok: true, shot: 'smash', label: '2人の間へスマッシュ',
+      why: 'ドロップで前に寄せたら、次はスマッシュ。前に出た相手は反応する時間が短い。前後に崩す（d29 の逆）。',
+      then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.0], mv: { C: [-0.6, 9.8], D: [0.6, 9.8] } } ] },
+    { k: 'イ', at: [0.7, 8.1], shot: 'drop', label: 'もう一度ドロップ',
+      why: '前に出てきた相手にドロップを続けると、目の前でたたかれる。',
+      then: [ { hit: 'A', shot: 'drop', to: [0.8, 8.3] }, { hit: 'D', shot: 'push', to: [-1.6, 3.6], mark: { at: [-1.6, 3.6], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [0.0, 12.9], shot: 'clear', label: '奥へクリア',
+      why: '攻めているのにクリアを打つと、攻める番を手放す。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.0, 12.9] }, { hit: 'D', shot: 'smash', to: [1.6, 3.2], mark: { at: [1.6, 3.2], text: '攻守交代' } } ] },
+  ],
+  theory: 'ドロップで前に寄せたら、スマッシュ。前後に崩す',
+  drill: '後衛役は「ドロップ→スマッシュ」「スマッシュ→ドロップ」を相手の位置で選ぶ。打つ前に「前にいる！」「後ろにいる！」と声に出す。' },
+
+{ id: 'd42', mode: 'doubles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: 'サービスからの3球目',
+  ask: 'サービスから、どう組み立てる？',
+  scene: 'A がサービスを打つ。パートナーの B は後ろのまん中にいる。',
+  start: { A: [0.45, 4.3], B: [0.0, 2.4], C: [-0.7, 9.3], D: [0.9, 11.3] },
+  sh: [0.45, 4.3, 1.0],
+  setup: [],
+  think: ['打点：サービス。低く短く打てる', '相手：C は前で待っている', 'だから：崩す。低く短いサービスで上げさせ、3球目から攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① A：ショートサービス → ② 上がった球を B が攻め、A は前で浮いた球をたたく',
+      why: 'ショートサービスで相手に下から打たせ、3球目は後ろの B が攻める。サーバーの A は前に残り、浮いた返球を決める。サービスから縦の形で組み立てる。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { A: [0.3, 4.6] } }, { hit: 'C', shot: 'lob', to: [0.8, 1.2], mv: { D: [1.3, 10.6] } }, { hit: 'B', shot: 'smash', to: [1.3, 10.7], mv: { C: [-1.3, 10.6] } }, { hit: 'D', shot: 'block', to: [0.6, 5.3] }, { hit: 'A', shot: 'push', to: [-1.2, 9.2] } ] },
+    { k: 'イ', label: '① A：ロングサービス → ② 横並びで守る',
+      why: 'ロングサービスは相手に上から打たせる。守りから始まる。',
+      then: [ { hit: 'A', shot: 'slong', to: [-1.2, 12.4], mv: { A: [1.3, 3.3], B: [-1.3, 3.3] } }, { hit: 'C', shot: 'smash', to: [0.0, 3.2], mark: { at: [0.0, 3.2], text: '先に攻められる' } } ] },
+    { k: 'ウ', label: '① A：ショートサービス → ② 下がって B と横並びになる',
+      why: 'サービスのあとに下がると、ネット前が空く。',
+      then: [ { hit: 'A', shot: 'sshort', to: [-0.3, 8.95], mv: { A: [1.2, 3.2], B: [-1.2, 3.2] } }, { hit: 'C', shot: 'net', to: [0.2, 5.5], mark: { at: [0.2, 5.5], text: '空く' } } ] },
+  ],
+  theory: 'サービスで下から打たせ、3球目から縦の形で攻める',
+  drill: 'サービスから5球目までを決めて練習する。①ショート→②相手のロブ→③パートナーのスマッシュ→④ブロック→⑤サーバーがプッシュ。' },
+
+/* ----- ダブルス：レシーブ・形の切りかえ（左右反転）・立ち位置・前衛（v0.4 で追加） ----- */
+{ id: 'd32', mode: 'doubles', cat: 'mamori', lv: 2, who: 'A', type: 'shot',
+  title: 'ドロップを前で取ったら',
+  ask: 'A は、どう返す？',
+  scene: '横並びで守っていたら、相手の後衛 D がドロップ。A は前に出て、白帯より下で取る。相手の前衛 C はネット前で待っている。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [0.4, 8.6], D: [0.6, 11.6] },
+  setup: [ { hit: 'D', shot: 'drop', to: [-1.0, 5.6], end: 0.5 } ],
+  think: ['打点：白帯より下。上からは打てない', '相手：前衛 C がネット前で待っている。奥は D だけ', 'だから：守り。深く上げて、横並びで守る'],
+  opts: [
+    { k: 'ア', at: [1.6, 12.9], ok: true, shot: 'lob', label: '奥へ深く上げる（B と横並びで守る）',
+      why: '前衛がネット前で待っているときに、ネット前へ返すとたたかれる。上げるなら深く、相手のバック奥へ。そして横並びで守る。',
+      then: [ { hit: 'A', shot: 'lob', to: [1.6, 12.9], mv: { A: [-1.3, 3.3], B: [1.3, 3.3] } }, { hit: 'D', shot: 'smash', to: [1.3, 3.5] }, { hit: 'B', shot: 'block', to: [-1.4, 8.6] } ] },
+    { k: 'イ', at: [-0.2, 7.6], shot: 'net', label: 'ヘアピン（前衛 C の正面）',
+      why: '待っている前衛の正面へのヘアピンは、そのままたたかれる。',
+      then: [ { hit: 'A', shot: 'net', to: [0.2, 7.6] }, { hit: 'C', shot: 'push', to: [0.0, 3.6], mark: { at: [0.0, 3.6], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [-0.8, 10.4], shot: 'half', label: 'ふわっと中ほどへ',
+      why: '中途半端な高さは、前衛にとられるチャンスボール。',
+      then: [ { hit: 'A', shot: 'half', to: [-0.4, 9.6] }, { hit: 'C', shot: 'smash', to: [0.0, 3.3], mark: { at: [0.0, 3.3], text: 'チャンスボール' } } ] },
+  ],
+  theory: '相手の前衛が待っているネット前には返さない。上げるなら深く',
+  drill: '守りの2人に、ノッカーがドロップを出す。相手の前衛役がネット前に立つときは深く上げる、立っていないときはヘアピン、と打ち分ける。' },
+
+{ id: 'd33', mode: 'doubles', cat: 'kirikae', lv: 3, who: 'A', type: 'move',
+  title: '前衛が右前で上げたら',
+  ask: '後ろの A は、どこへ？',
+  scene: '縦の形で攻めていたが、相手のクロスのブロックを B が右前で取り、ロブで上げるしかない。',
+  start: { A: [-0.1, 1.9], B: [-0.3, 4.7], C: [-1.4, 10.6], D: [1.4, 10.6] },
+  setup: [ { hit: 'A', shot: 'smash', to: [-1.4, 10.7] }, { hit: 'C', shot: 'block', to: [1.3, 5.4] } ],
+  opts: [
+    { k: 'ア', at: [-1.3, 3.3], ok: true, label: '左の中ほどへ',
+      why: 'B が右で上げたら、B は右の中ほどへ下がる。後ろの A は左の中ほどへ出て、横並び（サイドバイサイド）にする。',
+      then: [ { hit: 'B', shot: 'lob', to: [-0.3, 12.4], mv: { A: [-1.3, 3.3], B: [1.3, 3.3] } }, { hit: 'C', shot: 'smash', to: [-1.4, 3.5] }, { hit: 'A', shot: 'block', to: [-1.6, 8.7] } ] },
+    { k: 'イ', at: [-0.1, 1.9], label: 'まん中の後ろのまま',
+      why: '後ろのまん中に残ると、縦の形のまま。左の中ほどにスマッシュを打たれて届かない。',
+      then: [ { hit: 'B', shot: 'lob', to: [-0.3, 12.4], mv: { A: [-0.1, 1.9], B: [1.3, 3.3] } }, { hit: 'C', shot: 'smash', to: [-1.5, 3.6], mark: { at: [-1.5, 3.6], text: '空く' } } ] },
+    { k: 'ウ', at: [1.1, 2.6], label: '右のほう（B と同じ側）',
+      why: 'B と同じ側に寄ると、2人が重なって左が空く。',
+      then: [ { hit: 'B', shot: 'lob', to: [-0.3, 12.4], mv: { A: [1.1, 2.6], B: [1.3, 3.3] } }, { hit: 'C', shot: 'smash', to: [-1.6, 3.2], mark: { at: [-1.6, 3.2], text: '空く' } } ] },
+  ],
+  theory: '相方が上げたら、後衛は空いている側の中ほどへ。2人で横並びをつくる',
+  drill: '縦の形で攻める2人に、ノッカーが前衛の左右にブロックを出す。前衛がロブを上げたら、後衛は反対側の中ほどへ出る。' },
+
+{ id: 'd34', mode: 'doubles', cat: 'kirikae', lv: 1, who: 'B', type: 'move',
+  title: '上がってきたら縦の形へ（左奥）',
+  ask: 'A が後ろで打つ。B はどこへ？',
+  scene: '横並び（サイドバイサイド）で守っていたら、相手が左奥へ高く返してきた。A が下がってスマッシュを打つ。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.6, 11.4], D: [0.6, 9.0] },
+  setup: [ { hit: 'C', shot: 'clear', to: [-1.5, 1.2], mv: { C: [-1.3, 10.4], D: [1.3, 10.4] } } ],
+  opts: [
+    { k: 'ア', at: [-0.3, 4.6], ok: true, label: '前（ショートサービスラインのあたり）へ',
+      why: '相方が後ろで打つなら、自分は前へ。横並びから縦の形（トップアンドバック）に変わる合図は「相手が上げてきたこと」。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.3, 10.6], mv: { B: [-0.3, 4.6] } }, { hit: 'C', shot: 'block', to: [-0.8, 5.3] }, { hit: 'B', shot: 'push', to: [0.0, 9.0] } ] },
+    { k: 'イ', at: [1.3, 3.2], label: '右の中ほどのまま',
+      why: '横並びのままだと、ネット前に返された球に届かない。攻めているのに、前ががら空き。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.3, 10.6], mv: { B: [1.3, 3.2] } }, { hit: 'C', shot: 'block', to: [-0.6, 5.5], mark: { at: [-0.6, 5.5], text: '空く' } } ] },
+  ],
+  theory: '相手が上げてきたら縦の形へ。相方が後ろで打つなら、自分は前',
+  drill: '横並びの2人に、ノッカーがスマッシュ→クリアの順で出す。上がった側の人が後ろへ、もう1人は「前！」と言って前へ。左右を入れかえる。' },
+
+{ id: 'd35', mode: 'doubles', cat: 'kirikae', lv: 2, who: 'B', type: 'move',
+  title: '後衛がクリアで返したら（右奥）',
+  ask: '前衛の B は、どこへ？',
+  scene: '縦の形（トップアンドバック）で攻めていたが、相手のクリアで A が右奥に追いこまれ、クリアで返すしかない。',
+  start: { A: [-0.4, 2.0], B: [-0.2, 4.7], C: [-1.3, 10.4], D: [1.3, 10.4] },
+  setup: [ { hit: 'C', shot: 'clear', to: [2.2, 0.6] } ],
+  opts: [
+    { k: 'ア', at: [-1.3, 3.3], ok: true, label: '左の中ほどへ下がる（横並び）',
+      why: '後衛がクリアで上げたら、守りの番。前衛は下がって横並び（サイドバイサイド）に。A が右なら、B は左。',
+      then: [ { hit: 'A', shot: 'clear', to: [-0.4, 12.6], mv: { B: [-1.3, 3.3], A: [1.3, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.4, 3.4] }, { hit: 'B', shot: 'block', to: [1.5, 8.6] } ] },
+    { k: 'イ', at: [-0.3, 4.8], label: '前に残る',
+      why: '前に残ると、左側を守る人がいない。スマッシュを打たれて届かない。',
+      then: [ { hit: 'A', shot: 'clear', to: [-0.4, 12.6], mv: { B: [-0.3, 4.8], A: [1.3, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.6, 2.8], mark: { at: [-1.6, 2.8], text: '空く' } } ] },
+    { k: 'ウ', at: [0.4, 3.2], label: 'A と同じ右側へ下がる',
+      why: 'A と同じ側に下がると、2人が重なって反対側が空く。',
+      then: [ { hit: 'A', shot: 'clear', to: [-0.4, 12.6], mv: { B: [0.4, 3.2], A: [1.3, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.7, 3.0], mark: { at: [-1.7, 3.0], text: '空く' } } ] },
+  ],
+  theory: '自分たちが上げたら横並びへ。前衛は下がって、相方と反対側を守る',
+  drill: '縦の形で攻める2人に、ノッカーがときどき奥へクリアを出す。後衛がクリアで返したら、前衛は「サイド！」と言って下がる。' },
+
+{ id: 'd36', mode: 'doubles', cat: 'katachi', lv: 3, who: 'A', type: 'move',
+  title: '横並びの守りの寄り方（右奥から）',
+  ask: 'A は、どこに構える？',
+  scene: 'A と B は横並びで守っている。相手の D が、こちらから見て右奥からスマッシュを打つ。',
+  start: { A: [-1.3, 3.2], B: [1.3, 3.2], C: [-0.6, 9.4], D: [0.0, 11.0] },
+  setup: [ { hit: 'A', shot: 'lob', to: [1.9, 12.4], mv: { B: [1.5, 2.8] } } ],
+  opts: [
+    { k: 'ア', at: [-0.6, 3.6], ok: true, label: 'まん中寄りの少し前',
+      why: '2人ともシャトルの側（右）へ寄る。ストレート側の B はやや後ろ、クロス側の A はやや前で、センターとクロスのドロップを受け持つ。',
+      then: [ { mv: { A: [-0.6, 3.6] }, t: 0.5 }, { hit: 'D', shot: 'smash', to: [-0.3, 3.3] }, { hit: 'A', shot: 'block', to: [-1.9, 8.7] } ] },
+    { k: 'イ', at: [-2.0, 3.0], label: '左の外側',
+      why: '外へ広がると、2人の間（センター）が空く。どちらが取るか迷って、お見合いになる。',
+      then: [ { mv: { A: [-2.0, 3.0] }, t: 0.5 }, { hit: 'D', shot: 'smash', to: [-0.2, 2.9], mv: { A: [-1.6, 3.0], B: [1.0, 2.8] }, mark: { at: [-0.2, 2.9], text: '空く' } } ] },
+    { k: 'ウ', at: [-1.2, 1.3], label: '左の後ろ',
+      why: '下がりすぎ。クロスのドロップが前に落ちる。',
+      then: [ { mv: { A: [-1.2, 1.3] }, t: 0.5 }, { hit: 'D', shot: 'drop', to: [-1.0, 5.4], mv: { A: [-1.1, 2.7] }, mark: { at: [-1.0, 5.4], text: '空く' } } ] },
+  ],
+  theory: '守りはシャトルの側へ寄る。ストレート側はやや後ろ、クロス側はやや前',
+  drill: 'ノッカーがコートの左奥・右奥からスマッシュを打つ。守りの2人は、シャトルが左右に動くたびに寄り直す。「寄る→止まる→構える」を1本ずつ。' },
+
+{ id: 'd37', mode: 'doubles', cat: 'zenei', lv: 1, who: 'B', type: 'move',
+  title: 'スマッシュのときの前衛（左奥から）',
+  ask: '前衛の B は、どこに構える？',
+  scene: 'A が左奥から、ストレートにスマッシュを打つ。',
+  start: { A: [-1.5, 2.2], B: [0.0, 4.3], C: [-1.0, 8.9], D: [1.4, 9.6] },
+  setup: [ { hit: 'C', shot: 'lob', to: [-1.7, 1.0], mv: { C: [-1.6, 10.6], D: [1.5, 10.6] } } ],
+  opts: [
+    { k: 'ア', at: [-0.9, 4.7], ok: true, label: '左前（シャトルが向かった側）',
+      why: 'シャトルが向かった側に寄る。左からのストレートなら左。いちばん速く返ってくるストレートの返球を、前で止められる。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.6, 10.8], mv: { B: [-0.9, 4.7] } }, { hit: 'C', shot: 'block', to: [-1.0, 5.3] }, { hit: 'B', shot: 'push', to: [0.2, 9.4] } ] },
+    { k: 'イ', at: [1.3, 4.7], label: '右前',
+      why: '右に寄ると、いちばん返ってきやすいストレートの前が空く。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.6, 10.8], mv: { B: [1.3, 4.7] } }, { hit: 'C', shot: 'block', to: [-1.3, 5.4], mv: { B: [0.2, 5.0] }, mark: { at: [-1.3, 5.4], text: '空く' } } ] },
+    { k: 'ウ', at: [-0.1, 2.9], label: 'まん中の少し後ろ',
+      why: '下がりすぎ。ネット前に落とされた球に届かない。前衛はショートサービスラインのあたりで、ラケットを上げて待つ。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.6, 10.8], mv: { B: [-0.1, 2.9] } }, { hit: 'C', shot: 'block', to: [-0.8, 5.6], mv: { B: [-0.5, 4.0] }, mark: { at: [-0.8, 5.6], text: '空く' } } ] },
+  ],
+  theory: '前衛は、シャトルが向かった側に寄る',
+  drill: '3人1組。後衛役が左右からスマッシュ、受け手はストレートに返す。前衛役はシャトルが向かった側へ一歩寄って、前で止める。左右5本ずつ。' },
+
+/* ===== シングルス ===== */
+{ id: 's01', mode: 'singles', cat: 'home', lv: 1, who: 'A', type: 'move',
+  title: '打ったら戻る',
+  ask: '打ったあと、A はどこへ戻る？',
+  scene: '右奥に追いこまれた A が、相手の奥へクリアを返す。',
+  start: { A: [0.2, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'clear', to: [1.7, 1.0], mv: { C: [0.0, 10.0] } } ],
+  opts: [
+    { k: 'ア', at: [0.0, 3.0], ok: true, label: 'コートのまん中',
+      why: '打ったら、まん中（ホームポジション）へ戻る。前後左右、どこに打たれても同じくらいの距離で追える。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.8, 12.5], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'drop', to: [-1.6, 5.5] }, { hit: 'A', shot: 'net', to: [-1.3, 7.5] } ] },
+    { k: 'イ', at: [1.7, 1.0], label: '打ったその場',
+      why: 'その場に残ると、前とクロスががら空き。打ったら必ずまん中へ戻る。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.8, 12.5], mv: { A: [1.7, 1.0] } }, { hit: 'C', shot: 'drop', to: [-1.6, 5.5], mv: { A: [0.6, 2.6] }, mark: { at: [-1.6, 5.5], text: '空く' } } ] },
+    { k: 'ウ', at: [0.0, 5.3], label: 'ネットの前',
+      why: '前に出すぎると、頭の上を越される。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.8, 12.5], mv: { A: [0.0, 5.3] } }, { hit: 'C', shot: 'clear', to: [1.6, 0.7], mv: { A: [0.6, 3.4] }, mark: { at: [1.6, 0.7], text: '空く' } } ] },
+  ],
+  theory: '打ったら、コートのまん中（ホームポジション）へ戻る',
+  drill: '4すみノック。1球打つごとに、まん中に貼ったテープを踏んでから次へ。踏まずに動いたらやり直し。' },
+
+{ id: 's02', mode: 'singles', cat: 'haikyu', lv: 1, who: 'A', type: 'shot',
+  title: '相手から遠いところへ',
+  ask: 'A は、どこへ打つ？',
+  scene: '相手の C はコートのまん中で構えている。A は奥から打つ。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.3, 1.3], mv: { C: [0.0, 10.1] } } ],
+  opts: [
+    { k: 'ア', at: [0.0, 10.3], shot: 'drive', label: '相手の正面',
+      why: '正面の球は、相手が一歩も動かずに打てる。時間も角度も、相手にあげてしまう。',
+      then: [ { hit: 'A', shot: 'drive', to: [0.0, 10.3], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-2.2, 2.0], mark: { at: [-2.2, 2.0], text: '空く' } } ] },
+    { k: 'イ', at: [2.2, 12.9], ok: true, shot: 'clear', label: '奥のすみ（相手のバック側）',
+      why: '相手から遠いすみへ。相手を動かすと返球が甘くなり、次のねらいどころ（空いた前）ができる。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.2, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [0.2, 1.8], end: 2.6, mv: { A: [0.2, 1.8] }, mark: { at: [-1.8, 8.9], text: '次のねらい' } } ] },
+    { k: 'ウ', at: [0.4, 11.0], shot: 'half', label: '浅いクリア（中ほど）',
+      why: '高さも深さも中途半端な球は、相手が待ってスマッシュを打てる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.4, 11.0], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-2.0, 2.4], mark: { at: [-2.0, 2.4], text: '打ちこまれる' } } ] },
+  ],
+  theory: '相手から遠いところ（4すみ）へ。相手の正面に返さない',
+  drill: '2人で「4すみラリー」。打つ場所を毎回変え、同じすみに2回続けない。相手を1歩でも多く動かせたら勝ち。' },
+
+{ id: 's03', mode: 'singles', cat: 'haikyu', lv: 2, who: 'A', type: 'shot',
+  title: '対角線で走らせる',
+  ask: '相手をいちばん長く走らせるには？',
+  scene: 'A のヘアピンで、C を左前（こちらから見て）に動かした。C はロブを上げて、まん中へ戻ろうとしている。',
+  start: { A: [0.1, 4.6], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'net', to: [-1.9, 8.9], mv: { A: [0.0, 3.6] } }, { hit: 'C', shot: 'lob', to: [0.3, 1.8], mv: { C: [-1.4, 9.5] } } ],
+  opts: [
+    { k: 'ア', at: [2.2, 12.9], ok: true, shot: 'clear', label: '対角の奥（右奥）',
+      why: '前に動かしたら、対角の奥へ。いちばん遠いのは対角線。返球が甘くなったところを決める。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.2, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.4, 3.4] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.2] } ] },
+    { k: 'イ', at: [-2.2, 12.9], shot: 'clear', label: '同じ側の奥（左奥）',
+      why: '同じ側の奥は、前からまっすぐ下がるだけで届く。走る距離が短い。',
+      then: [ { hit: 'A', shot: 'clear', to: [-2.2, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [-2.2, 12.9], text: 'らくに届く' } }, { hit: 'C', shot: 'clear', to: [1.8, 1.2], end: 2.6, mv: { A: [1.8, 1.2] } } ] },
+    { k: 'ウ', at: [-0.9, 8.3], shot: 'drop', label: 'もう一度、左前へ',
+      why: 'C はまだ前の近くにいる。同じ前に落としても、すぐ届いてたたかれる。',
+      then: [ { hit: 'A', shot: 'drop', to: [-0.9, 8.3], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'push', to: [2.0, 2.2], mark: { at: [2.0, 2.2], text: 'たたかれる' } } ] },
+  ],
+  theory: '前に動かしたら、対角の奥へ。いちばん遠いのは対角線',
+  drill: '「前→対角の奥」の2球セット練習。ノッカーが前に出した球をヘアピン、次の球を対角の奥へクリア。左右を入れかえて5セット。' },
+
+{ id: 's04', mode: 'singles', cat: 'kurushii', lv: 2, who: 'A', type: 'shot',
+  title: '追いこまれたとき',
+  ask: 'A は、どう返す？',
+  scene: '相手の速いクリアで、A は左奥に追いこまれた。体勢が苦しい。',
+  start: { A: [-0.2, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'aclear', to: [-2.2, 0.5], end: 1.8, mv: { C: [0.0, 10.0] } } ],
+  opts: [
+    { k: 'ア', at: [-1.2, 12.8], ok: true, shot: 'clear', label: '高く深いクリア',
+      why: '苦しいときは、高く深く返す。シャトルが飛んでいるあいだに、まん中へ戻る時間ができる。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.2, 12.8], mv: { A: [0.0, 3.0] }, mark: { at: [0.0, 3.0], text: '戻れた' } }, { hit: 'C', shot: 'clear', to: [0.6, 1.6], end: 2.6, mv: { A: [0.6, 1.6] } } ] },
+    { k: 'イ', at: [-1.0, 10.6], shot: 'smash', label: 'スマッシュで打ち返す',
+      why: '体勢がくずれたスマッシュは速さが出ない。前に落とされると、戻る時間もない。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.0, 10.6], mv: { A: [-1.6, 1.3] } }, { hit: 'C', shot: 'block', to: [1.5, 5.5], mv: { A: [-0.8, 2.2] }, mark: { at: [1.5, 5.5], text: '空く' } } ] },
+    { k: 'ウ', at: [-1.4, 8.9], shot: 'drop', label: 'ネット前へドロップ',
+      why: '遅れて打つドロップは浮きやすい。前で待つ相手にたたかれる。',
+      then: [ { hit: 'A', shot: 'drop', to: [-1.4, 8.9], mv: { A: [-1.5, 1.4] } }, { hit: 'C', shot: 'push', to: [1.8, 3.2], mark: { at: [1.8, 3.2], text: 'たたかれる' } } ] },
+  ],
+  think: ['打点：低い。体の後ろで、追いこまれている', '相手：まん中で待っている', 'だから：守り。高く深く上げて時間をつくる'],
+  theory: '苦しいときは、高く深く。シャトルが飛ぶ時間で体勢を立て直す',
+  drill: 'ノッカーが速いクリアで奥へ追いこむ。追いこまれたら、どんな体勢でも「高く・奥へ」。返したあと、まん中まで戻れたら1点。' },
+
+{ id: 's05', mode: 'singles', cat: 'kurushii', lv: 3, who: 'A', type: 'shot',
+  title: '苦しいときのクリアの向き',
+  ask: 'クリアは、どちらへ返す？',
+  scene: '左奥に追いこまれた A が、高いクリアで返す。ストレートとクロス、どちらがいい？',
+  start: { A: [-0.2, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'aclear', to: [-2.2, 0.5], end: 1.8, mv: { C: [0.0, 10.0] } } ],
+  opts: [
+    { k: 'ア', at: [-1.9, 12.8], ok: true, shot: 'clear', label: 'ストレートの奥',
+      why: 'ストレートは距離が短く、まん中の相手の近くを通らない。相手のストレートの返球も、自分のいる側に返ってくる。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.9, 12.8], mv: { A: [-0.3, 2.9] } }, { hit: 'C', shot: 'smash', to: [-1.1, 3.0] }, { hit: 'A', shot: 'block', to: [-1.5, 8.9] } ] },
+    { k: 'イ', at: [2.0, 12.8], shot: 'clear', label: 'クロスの奥',
+      why: 'クロスは距離が長く、まん中の相手の近くを通る。低くなると途中で打たれ、相手のストレートは自分から遠い右側に来る。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.0, 12.8], mv: { A: [-0.6, 2.4] } }, { hit: 'C', shot: 'smash', to: [2.0, 3.2], mark: { at: [2.0, 3.2], text: '空く' } } ] },
+  ],
+  theory: '苦しいときは、ストレートに高く。クロスは距離が長く、まん中を通る',
+  drill: 'ノッカーが左奥・右奥に追いこむ球を出す。返球はストレートの奥だけ。奥のダブルスのサービスラインより後ろに入った本数を数える。' },
+
+{ id: 's06', mode: 'singles', cat: 'haikyu', lv: 1, who: 'A', type: 'shot',
+  title: '相手が前に詰めてきた',
+  ask: 'A は、どこへ打つ？',
+  scene: 'C はヘアピンを打ったあと、ネットの前に詰めてきた。',
+  start: { A: [0.0, 3.2], C: [-0.2, 9.5] },
+  setup: [ { hit: 'C', shot: 'net', to: [0.4, 5.7], mv: { C: [-0.1, 8.2] } } ],
+  opts: [
+    { k: 'ア', at: [-0.2, 7.3], shot: 'net', label: 'ヘアピンで返す',
+      why: '相手は目の前で待っている。ネット前に返すと、そのままたたかれる。',
+      then: [ { hit: 'A', shot: 'net', to: [-0.2, 7.3] }, { hit: 'C', shot: 'push', to: [1.7, 2.4], mark: { at: [1.7, 2.4], text: 'たたかれる' } } ] },
+    { k: 'イ', at: [2.0, 12.8], ok: true, shot: 'lob', label: '奥へ高く上げる',
+      why: '相手が前なら、奥が空いている。高く深く上げて、相手を下がらせる。',
+      then: [ { hit: 'A', shot: 'lob', to: [2.0, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [0.3, 1.5], end: 2.6, mv: { A: [0.3, 1.5] } } ] },
+    { k: 'ウ', at: [0.9, 10.8], shot: 'half', label: '低めのロブ（中ほど）',
+      why: '高さが足りないと、前の相手に途中でとられる。上げるなら高く、奥まで。',
+      then: [ { hit: 'A', shot: 'half', to: [0.6, 9.7], mv: { A: [0.0, 3.4] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.6], mark: { at: [-1.9, 2.6], text: 'たたかれる' } } ] },
+  ],
+  think: ['打点：低い（白帯より下）', '相手：ネット前に詰めている。奥が空いている', 'だから：崩す。奥へ高く上げて、相手を下げる'],
+  theory: '相手が前なら奥へ、奥なら前へ。相手のいないところへ打つ',
+  drill: 'ネット前の打ち合いから、相手が詰めてきたら合図なしで奥へロブ。「相手のラケットが届かない高さ」を合言葉に。' },
+
+{ id: 's07', mode: 'singles', cat: 'home', lv: 2, who: 'A', type: 'move',
+  title: 'スマッシュのあとの位置',
+  ask: 'スマッシュのあと、A はどこへ？',
+  scene: '相手のクリアが浅くなった。A がスマッシュを打つ。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'half', to: [0.6, 2.0] } ],
+  opts: [
+    { k: 'ア', at: [0.2, 4.0], ok: true, label: '少し前（まん中より前）',
+      why: 'スマッシュの返球は、ネット前に返ってきやすい。打ったら一歩前につめて、次をたたく。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.7, 10.6], mv: { A: [0.2, 4.0] } }, { hit: 'C', shot: 'block', to: [-0.4, 5.4] }, { hit: 'A', shot: 'push', to: [-1.9, 9.6] } ] },
+    { k: 'イ', at: [0.6, 2.0], label: 'その場（後ろ）',
+      why: '後ろに残ると、ネット前に落とされた球に間に合わない。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.7, 10.6], mv: { A: [0.6, 2.0] } }, { hit: 'C', shot: 'block', to: [-0.5, 5.5], mv: { A: [0.2, 3.2] }, mark: { at: [-0.5, 5.5], text: '空く' } } ] },
+    { k: 'ウ', at: [0.1, 5.7], label: 'ネットにぴったり',
+      why: '前に出すぎると、ロブで頭の上を越される。つめるのは一歩だけ。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.7, 10.6], mv: { A: [0.1, 5.7] } }, { hit: 'C', shot: 'lob', to: [-1.6, 0.8], mv: { A: [-0.4, 4.0] }, mark: { at: [-1.6, 0.8], text: '空く' } } ] },
+  ],
+  theory: 'スマッシュのあとは、一歩前へ。返球はネット前に来やすい',
+  drill: 'スマッシュ→ネット前の2球セット。ノッカーが上げた球をスマッシュ、すぐ前に出された球をプッシュかヘアピン。' },
+
+{ id: 's08', mode: 'singles', cat: 'serve', lv: 1, who: 'A', type: 'shot',
+  title: 'シングルスのサービス',
+  ask: 'A は、どこへサービスを打つ？',
+  scene: 'シングルスのサービス。A は右のサービスコートから打つ。',
+  start: { A: [0.4, 3.4], C: [-0.6, 10.5] },
+  sh: [0.4, 3.4, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [-0.3, 13.0], ok: true, shot: 'slong', label: '高く深く、奥のセンター寄り',
+      why: '高く深く上げると、相手は奥から打つしかない。センター寄りなら返球の角度もせまい。ショートサービスは、これが打てるようになってから。',
+      then: [ { hit: 'A', shot: 'slong', to: [-0.3, 13.0], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'drop', to: [0.5, 5.4], end: 0.5, mv: { A: [0.5, 5.4] } } ] },
+    { k: 'イ', at: [-0.9, 11.0], shot: 'shalf', label: '中くらいの高さで、中ほどへ',
+      why: '高さも深さも足りない球は、いきなりスマッシュされる。',
+      then: [ { hit: 'A', shot: 'shalf', to: [-0.9, 11.0], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [1.9, 2.3], mark: { at: [1.9, 2.3], text: '打ちこまれる' } } ] },
+    { k: 'ウ', at: [-2.4, 13.0], shot: 'slong', label: '奥のサイドライン寄り',
+      why: 'サイドはアウトの危険がある。外から打たれると角度がつき、大きく振られる。',
+      then: [ { hit: 'A', shot: 'slong', to: [-2.4, 13.0], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'drop', to: [2.1, 5.3], mv: { A: [1.2, 4.1] }, mark: { at: [2.1, 5.3], text: '振られる' } } ] },
+  ],
+  theory: 'シングルスのサービスは、高く深く。まずは奥のセンター寄りへ',
+  drill: 'ロングサービス10本。奥のダブルスのサービスラインより後ろ、センター寄りに置いたかごをねらう。入った本数を記録する。' },
+
+/* ----- シングルス（v0.2 で追加） ----- */
+{ id: 's09', mode: 'singles', cat: 'home', lv: 2, who: 'A', type: 'move',
+  title: 'ヘアピンのあとの位置',
+  ask: 'ヘアピンを打ったあと、A はどこへ？',
+  scene: '相手のドロップを、A が左前でヘアピンで返す。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.0] },
+  setup: [ { hit: 'C', shot: 'drop', to: [-1.4, 5.6], mv: { C: [0.0, 10.1] } } ],
+  opts: [
+    { k: 'ア', at: [-1.2, 5.8], label: 'ネット前に残る',
+      why: 'ネット前に残ると、ロブで頭の上を越される。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.4, 8.9], mv: { A: [-1.2, 5.8] } }, { hit: 'C', shot: 'lob', to: [1.6, 0.9], mv: { A: [-0.5, 4.3] }, mark: { at: [1.6, 0.9], text: '空く' } } ] },
+    { k: 'イ', at: [-0.2, 3.9], ok: true, label: 'まん中より少し前へ戻る',
+      why: 'ヘアピンのあと、相手はロブかネット前で返すしかない。まん中より少し前なら、どちらにも間に合う。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.4, 8.9], mv: { A: [-0.2, 3.9] } }, { hit: 'C', shot: 'lob', to: [1.5, 1.1] }, { hit: 'A', shot: 'clear', to: [1.9, 12.6] } ] },
+    { k: 'ウ', at: [0.0, 1.4], label: 'いちばん後ろまで下がる',
+      why: '下がりすぎると、もう一度ネット前に落とされて届かない。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.4, 8.9], mv: { A: [0.0, 1.4] } }, { hit: 'C', shot: 'net', to: [-0.8, 5.7], mv: { A: [-0.3, 3.3] }, mark: { at: [-0.8, 5.7], text: '空く' } } ] },
+  ],
+  theory: 'ヘアピンのあとは、まん中より少し前で構える',
+  drill: '「ヘアピン→戻る→ロブかネット前を追う」をノッカーとくり返す。戻る位置にテープを貼っておく。' },
+
+{ id: 's10', mode: 'singles', cat: 'home', lv: 3, who: 'A', type: 'move',
+  title: '相手の打つ位置で構えを変える',
+  ask: 'A は、どこに構える？',
+  scene: 'A のクリアで、相手の C は右奥（こちらから見て）に下がった。C がスマッシュを打ってくる。',
+  start: { A: [-0.4, 3.0], C: [0.3, 10.4] },
+  setup: [ { hit: 'A', shot: 'clear', to: [2.0, 12.6], mv: { A: [-0.3, 3.0] } } ],
+  opts: [
+    { k: 'ア', at: [0.4, 3.1], ok: true, label: 'まん中から少し右（ストレート側）',
+      why: '相手の打つ位置に合わせて、まん中から少しずれる。右奥から打つなら、速いストレートが来る右へ半歩。クロスは距離が長いので間に合う。',
+      then: [ { mv: { A: [0.4, 3.1] }, t: 0.5 }, { hit: 'C', shot: 'smash', to: [1.6, 3.0] }, { hit: 'A', shot: 'block', to: [1.4, 8.9] } ] },
+    { k: 'イ', at: [-0.8, 3.1], label: 'まん中から左（クロス側）',
+      why: 'クロス側に寄ると、いちばん速いストレートのスマッシュに届かない。',
+      then: [ { mv: { A: [-0.8, 3.1] }, t: 0.5 }, { hit: 'C', shot: 'smash', to: [1.9, 3.0], mv: { A: [0.3, 3.0] }, mark: { at: [1.9, 3.0], text: '空く' } } ] },
+    { k: 'ウ', at: [0.2, 1.4], label: '後ろへ下がる',
+      why: '下がりすぎると、ドロップで前に落とされる。',
+      then: [ { mv: { A: [0.2, 1.4] }, t: 0.5 }, { hit: 'C', shot: 'drop', to: [1.0, 5.5], mv: { A: [0.5, 3.2] }, mark: { at: [1.0, 5.5], text: '空く' } } ] },
+  ],
+  theory: '構える位置は、相手の打つ位置で変わる。ストレート側に少し寄る',
+  drill: 'ノッカーが左奥・右奥から打つ。打つ前に、ストレート側へ半歩寄って構える。ノッカーはストレートとクロスをまぜる。' },
+
+{ id: 's11', mode: 'singles', cat: 'haikyu', lv: 1, who: 'A', type: 'shot',
+  title: 'ラインぎりぎりをねらわない',
+  ask: 'A は、どこをねらう？',
+  scene: 'A が相手のバック奥（こちらから見て右奥）へクリアを打つ。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.3, 1.3], mv: { C: [0.0, 10.1] } } ],
+  opts: [
+    { k: 'ア', at: [2.45, 13.2], shot: 'clear', label: '角のぎりぎり',
+      why: 'ぎりぎりをねらうと、少しずれただけでアウトになる。相手は見送るだけで点になる。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.75, 13.55], out: true, mv: { A: [0.0, 3.0], C: [1.4, 12.2] }, mark: { at: [2.75, 13.55], text: 'アウト' } } ] },
+    { k: 'イ', at: [1.9, 12.7], ok: true, shot: 'clear', label: '角から内側に一歩（50cmほど）',
+      why: 'ねらうのは、線から内側に一歩。少しずれても入るし、相手は十分に動く。',
+      then: [ { hit: 'A', shot: 'clear', to: [1.9, 12.7], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [-0.4, 1.6], end: 2.6, mv: { A: [-0.4, 1.6] } } ] },
+    { k: 'ウ', at: [0.3, 11.0], shot: 'half', label: '安全に、中ほどへ浅く',
+      why: '安全すぎる浅い球は、相手にスマッシュされる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.3, 11.0], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: 'たたかれる' } } ] },
+  ],
+  theory: 'ねらうのは線の内側一歩。ぎりぎりは自分のミスになる',
+  drill: 'コートの4すみから内側50cmの所にテープで四角を作り、クリアとドロップをその中にねらう。10本中何本入ったかを記録する。' },
+
+{ id: 's12', mode: 'singles', cat: 'haikyu', lv: 1, who: 'A', type: 'shot',
+  title: 'チャンスボールは相手のいない側へ',
+  ask: 'A のスマッシュは、どこへ？',
+  scene: 'A のヘアピンで、相手の C は左前（こちらから見て）から浅い球を上げてしまった。C はまだ左寄りにいる。',
+  start: { A: [0.1, 4.4], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'net', to: [-1.9, 8.9], end: 0.5, mv: { A: [0.0, 3.2] } }, { hit: 'C', shot: 'half', to: [0.2, 2.8], mv: { C: [-1.2, 9.6] } } ],
+  opts: [
+    { k: 'ア', at: [1.8, 11.0], ok: true, shot: 'smash', label: '相手のいない右側',
+      why: 'チャンスは、相手から遠い側へ決める。強さより、場所。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.8, 11.0], mv: { C: [0.2, 10.0] } } ] },
+    { k: 'イ', at: [-1.3, 10.2], shot: 'smash', label: '相手のいる左側',
+      why: '相手のいる側に打つと、強いスマッシュでも届いて返される。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.3, 10.2] }, { hit: 'C', shot: 'block', to: [1.5, 5.5], mark: { at: [1.5, 5.5], text: '空く' } } ] },
+    { k: 'ウ', at: [0.2, 12.9], shot: 'clear', label: 'クリアでつなぐ',
+      why: 'チャンスにクリアでつなぐと、相手に戻る時間をあげてしまう。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.2, 12.9], mark: { at: [0.2, 12.9], text: '時間をあげる' } }, { hit: 'C', shot: 'clear', to: [-1.6, 1.0], end: 2.6, mv: { A: [-1.6, 1.0] } } ] },
+  ],
+  think: ['打点：高い。チャンスボール', '相手：まだ左寄り。右が空いている', 'だから：攻め。相手から遠い右へ決める'],
+  theory: 'チャンスボールは、相手から遠い側へ決める',
+  drill: 'ノッカーが浅い球を上げる。相手役は左右どちらかに立ち、打つ人は相手役のいない側へスマッシュ。相手役は立つ位置を毎回変える。' },
+
+{ id: 's13', mode: 'singles', cat: 'haikyu', lv: 2, who: 'A', type: 'shot',
+  title: '前後にゆさぶる',
+  ask: 'A は、どこへ打つ？',
+  scene: 'A のクリアを、相手の C は奥から返した。C はまだ奥にいて、戻りきれていない。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'A', shot: 'clear', to: [0.4, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [-0.3, 1.4], mv: { C: [0.3, 12.3] } } ],
+  opts: [
+    { k: 'ア', at: [-1.4, 8.9], ok: true, shot: 'drop', label: 'ネット前へドロップ',
+      why: '相手が奥にいるうちに、前へ。前後に動かすと、相手はコートの長さいっぱいを走る。',
+      then: [ { hit: 'A', shot: 'drop', to: [-1.4, 8.9], end: 0.4, mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.0] }, { hit: 'A', shot: 'smash', to: [1.8, 11.2] } ] },
+    { k: 'イ', at: [0.3, 12.9], shot: 'clear', label: '相手のいる奥へクリア',
+      why: '相手がいる所へ打つと、待ちかまえて強く打たれる。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.3, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '打ちこまれる' } } ] },
+    { k: 'ウ', at: [0.3, 11.0], shot: 'half', label: '中ほどへ浅く',
+      why: '浅い球は、相手が一歩前に出てたたける。',
+      then: [ { hit: 'A', shot: 'half', to: [0.3, 11.2], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'たたかれる' } } ] },
+  ],
+  think: ['打点：高い。奥から余裕をもって打てる', '相手：奥にいて戻りきれていない。前が空いている', 'だから：崩す。ネット前へ落とす'],
+  theory: '奥にいる相手には前へ。前後にゆさぶる',
+  drill: 'クリア→ドロップ→クリア→ドロップの順に、同じ相手と打ち合う。慣れたら順番をくずす。' },
+
+{ id: 's14', mode: 'singles', cat: 'haikyu', lv: 2, who: 'A', type: 'shot',
+  title: '右利きのバック奥',
+  ask: '右利きの C がいちばん苦しいのは、どこ？',
+  scene: 'A が奥からクリアを打つ。相手の C は右利き。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.2, 1.3], mv: { C: [0.0, 10.1] } } ],
+  opts: [
+    { k: 'ア', at: [2.1, 12.8], ok: true, shot: 'clear', label: 'バック奥（こちらから見て右奥）',
+      why: '右利きのバック奥は、体の向きを変えて打つので苦しい。返球が浅く、弱くなりやすい。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.4] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.0] } ] },
+    { k: 'イ', at: [-2.1, 12.8], shot: 'clear', label: 'フォア奥（こちらから見て左奥）',
+      why: 'フォア奥は、相手がいちばん強く打てる場所。スマッシュが返ってくる。',
+      then: [ { hit: 'A', shot: 'clear', to: [-2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '強く打たれる' } } ] },
+    { k: 'ウ', at: [0.0, 10.4], shot: 'drive', label: '相手の正面',
+      why: '正面は、相手が動かずに打てる。',
+      then: [ { hit: 'A', shot: 'drive', to: [0.0, 10.4], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [2.0, 2.2], mark: { at: [2.0, 2.2], text: '空く' } } ] },
+  ],
+  theory: '右利きの相手は、バック奥が苦しい。そこをねらう',
+  drill: '相手のバック奥へのクリアだけで10本続ける。受ける側は、バック奥から奥まで返す練習になる。' },
+
+{ id: 's15', mode: 'singles', cat: 'kurushii', lv: 1, who: 'A', type: 'shot',
+  title: '前で遅れたとき',
+  ask: 'A は、どう返す？',
+  scene: '相手の速いドロップに、A は右前（こちらから見て）で遅れて、低い所でやっと届いた。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.0] },
+  setup: [ { hit: 'C', shot: 'drop', to: [1.7, 5.6], end: 0.3, a: 0.4, t: 0.8, mv: { C: [0.0, 9.6] } } ],
+  opts: [
+    { k: 'ア', at: [0.5, 12.9], ok: true, shot: 'lob', label: '高く深いロブ',
+      why: '遅れたら、高く深く上げて時間をつくる。シャトルが飛んでいるあいだに、まん中へ戻る。',
+      then: [ { hit: 'A', shot: 'lob', to: [0.5, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [0.0, 3.0], text: '戻れた' } }, { hit: 'C', shot: 'clear', to: [-1.4, 1.2], end: 2.6, mv: { A: [-1.4, 1.2] } } ] },
+    { k: 'イ', at: [1.4, 7.4], shot: 'net', label: 'ヘアピンで返す',
+      why: '低い所から遅れて打つヘアピンは、浮いてたたかれる。',
+      then: [ { hit: 'A', shot: 'net', to: [1.4, 7.4] }, { hit: 'C', shot: 'push', to: [-1.9, 2.6], mark: { at: [-1.9, 2.6], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [0.6, 10.8], shot: 'half', label: '低めのロブ（中ほど）',
+      why: '高さが足りないロブは、スマッシュされる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.6, 10.8] }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: 'たたかれる' } } ] },
+  ],
+  think: ['打点：低い。遅れてやっと届いた', '相手：まん中で待っている', 'だから：守り。高く深く上げて時間をつくる'],
+  theory: '前で遅れたら、高く深いロブで時間をつくる',
+  drill: 'ノッカーが速いドロップを出す。遅れたら高いロブ、間に合ったらヘアピン、と打ち分ける。' },
+
+{ id: 's16', mode: 'singles', cat: 'serve', lv: 2, who: 'A', type: 'move',
+  title: 'シングルスのレシーブの構え',
+  ask: 'レシーブの A は、どこに構える？',
+  scene: '相手 C のサービス。シングルスは、高く深いサービスもショートサービスもある。',
+  start: { A: [0.9, 2.4], C: [-0.4, 10.0] },
+  sh: [-0.4, 10.0, 1.0],
+  setup: [],
+  opts: [
+    { k: 'ア', at: [0.5, 3.4], ok: true, label: 'ショートサービスラインから1歩半後ろ',
+      why: 'シングルスは高く深いサービスが多い。ショートサービスラインから1歩半後ろなら、前にも後ろにも届く。',
+      then: [ { mv: { A: [0.5, 3.4] }, t: 0.4 }, { hit: 'C', shot: 'slong', to: [0.5, 0.6] }, { hit: 'A', shot: 'clear', to: [-1.8, 12.6] } ] },
+    { k: 'イ', at: [0.5, 4.45], label: 'ショートサービスラインのすぐ後ろ（ダブルスと同じ）',
+      why: 'ダブルスと同じ前寄りだと、高く深いサービスに頭の上を越される。',
+      then: [ { mv: { A: [0.5, 4.45] }, t: 0.4 }, { hit: 'C', shot: 'slong', to: [0.5, 0.5], mv: { A: [0.5, 2.3] }, mark: { at: [0.5, 0.5], text: '越される' } } ] },
+    { k: 'ウ', at: [0.5, 1.2], label: 'いちばん後ろ',
+      why: '後ろすぎると、ショートサービスに届かない。',
+      then: [ { mv: { A: [0.5, 1.2] }, t: 0.4 }, { hit: 'C', shot: 'sshort', to: [0.3, 4.5], mv: { A: [0.4, 2.9] }, mark: { at: [0.3, 4.5], text: '届かない' } } ] },
+  ],
+  theory: 'シングルスのレシーブは、ダブルスより後ろ。前にも後ろにも届く所で構える',
+  drill: 'レシーブの位置にテープで印をつけ、ロングとショートをまぜたサービスを10本受ける。届かなかった方向に半歩ずらして、自分の位置を決める。' },
+
+{ id: 's17', mode: 'singles', cat: 'serve', lv: 1, who: 'A', type: 'move',
+  title: 'サービスを打つ位置',
+  ask: 'A は、どこからサービスを打つ？',
+  scene: 'シングルスのサービス。A は右のサービスコートから、高く深いサービスを打つ。',
+  start: { A: [1.0, 2.4], C: [-0.5, 10.5] },
+  setup: [],
+  opts: [
+    { k: 'ア', at: [0.4, 3.6], ok: true, label: 'センター寄り、ショートサービスラインから1mほど後ろ',
+      why: 'センター寄りで、ショートサービスラインから1mほど後ろ。打ったあと、そのままホームポジションで構えられる。',
+      then: [ { mv: { A: [0.4, 3.6] }, t: 0.5 }, { hit: 'A', shot: 'slong', to: [-0.3, 13.0], mv: { A: [0.0, 3.1] } }, { hit: 'C', shot: 'clear', to: [-1.8, 1.0], end: 2.6, mv: { A: [-1.8, 1.0] } } ] },
+    { k: 'イ', at: [2.0, 3.6], label: 'サイドライン寄り',
+      why: 'サイドに寄ると、反対側が遠くなる。逆の奥へ返されると間に合わない。',
+      then: [ { mv: { A: [2.0, 3.6] }, t: 0.5 }, { hit: 'A', shot: 'slong', to: [-0.3, 13.0] }, { hit: 'C', shot: 'clear', to: [-1.9, 0.9], mv: { A: [-0.4, 2.2] }, mark: { at: [-1.9, 0.9], text: '空く' } } ] },
+    { k: 'ウ', at: [0.4, 4.55], label: 'ショートサービスラインのすぐ後ろ',
+      why: '前すぎると、奥へ返された球が遠い。',
+      then: [ { mv: { A: [0.4, 4.55] }, t: 0.5 }, { hit: 'A', shot: 'slong', to: [-0.3, 13.0] }, { hit: 'C', shot: 'clear', to: [-1.9, 0.8], mv: { A: [-0.9, 2.4] }, mark: { at: [-1.9, 0.8], text: '空く' } } ] },
+  ],
+  theory: 'シングルスのサービスは、センター寄り・少し後ろから。打ったらそこがホームポジション',
+  drill: 'サービス→ホームポジションで構える、までを1セットに。打ったあと、構え直すまでの足の動きを1歩以内にする。' },
+
+/* ----- シングルス：考えて打つ（v0.3 で追加） ----- */
+{ id: 's18', mode: 'singles', cat: 'ito', lv: 1, who: 'A', type: 'shot',
+  title: '白帯より上で取れたら',
+  ask: 'A は、どう打つ？',
+  scene: 'ネット前の打ち合い。C の球が白帯より高く浮いた。C はまん中まで下がっている。',
+  start: { A: [0.0, 3.4], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'drop', to: [-0.8, 8.9], mv: { A: [0.1, 4.6] } }, { hit: 'C', shot: 'float', to: [0.3, 5.8], mv: { C: [0.1, 9.9] } } ],
+  think: ['打点：白帯より上。上から打てる', '相手：まん中に下がった。ネット前の左右が空いている', 'だから：攻め。上から下へ沈める'],
+  opts: [
+    { k: 'ア', at: [-1.9, 9.2], ok: true, shot: 'push', label: '上から押しこむ（相手のいない左へ）',
+      why: '白帯より上で取れたら、攻める番。ラケットを立てて、上から相手のいない所へ押しこむ。',
+      then: [ { hit: 'A', shot: 'push', to: [-1.9, 9.2], mv: { C: [-1.0, 9.6] } } ] },
+    { k: 'イ', at: [0.4, 12.9], shot: 'lob', label: 'とりあえず奥へ上げる',
+      why: '上で取れたのに上げると、相手に攻める番を渡してしまう。',
+      then: [ { hit: 'A', shot: 'lob', to: [0.4, 12.9], mv: { A: [0.0, 3.2] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '攻守が入れかわる' } } ] },
+    { k: 'ウ', at: [0.9, 11.2], shot: 'half', label: 'とりあえず相手のほうへ返す',
+      why: '考えずに相手のほうへ返すと、中途半端な高さになって、相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.9, 11.2] }, { hit: 'C', shot: 'smash', to: [1.9, 2.6], mark: { at: [1.9, 2.6], text: 'チャンスボール' } } ] },
+  ],
+  theory: '白帯より上で取れたら、攻める。上から下へ',
+  drill: 'ネット前で、ノッカーが高さを変えて球を出す。打つ前に「上！」「下！」と声に出してから打つ。上ならプッシュ、下ならヘアピンかロブ。' },
+
+{ id: 's19', mode: 'singles', cat: 'ito', lv: 2, who: 'A', type: 'shot',
+  title: '白帯より下で取ったら',
+  ask: 'A は、どう打つ？',
+  scene: 'ネット前の打ち合い。C のヘアピンが白帯すれすれに落ちてきて、A は白帯よりずっと下で取る。C はまん中まで下がっている。',
+  start: { A: [0.0, 3.4], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'drop', to: [-0.8, 8.9], mv: { A: [0.1, 4.6] } }, { hit: 'C', shot: 'net', to: [0.3, 5.9], end: 0.3, mv: { C: [0.1, 9.9] } } ],
+  think: ['打点：白帯よりずっと下。上からは打てない', '相手：まん中に下がった。ネット前が遠い', 'だから：崩す。白帯すれすれに沈める（高く深く上げて、守りに回ってもよい）'],
+  opts: [
+    { k: 'ア', at: [-0.7, 7.2], ok: true, shot: 'net', label: '白帯すれすれのヘアピン',
+      why: '白帯より下で取ったら、上からは打てない。白帯すれすれに沈めれば、まん中の相手は下から上げるしかない。高く深いロブでもよい。どちらでも「はっきり」打つ。',
+      then: [ { hit: 'A', shot: 'net', to: [-0.7, 7.2] }, { hit: 'C', shot: 'lob', to: [0.3, 2.0] }, { hit: 'A', shot: 'smash', to: [1.8, 10.6] } ] },
+    { k: 'イ', at: [-0.6, 9.2], shot: 'drive', label: 'とりあえず強く打ち返す',
+      why: '下から強く打つと、球が上に浮く。まん中の相手にたたかれるチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'drive', to: [-0.5, 9.3] }, { hit: 'C', shot: 'smash', to: [-1.9, 2.6], mark: { at: [-1.9, 2.6], text: 'チャンスボール' } } ] },
+    { k: 'ウ', at: [0.9, 11.4], shot: 'half', label: 'ふわっと、中くらいの高さで上げる',
+      why: '高さも深さも中途半端な球は、相手がいちばん打ちやすい。上げるなら、高く深く。',
+      then: [ { hit: 'A', shot: 'half', to: [0.9, 11.4] }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'チャンスボール' } } ] },
+  ],
+  theory: '白帯より下で取ったら、沈めるか、高く深く上げる。強く打ち返さない',
+  drill: 'ノッカーが白帯すれすれの球を出す。打つ前に「下！」と声に出し、ヘアピンかロブかを決めてから打つ。強く打ち返したらやり直し。' },
+
+{ id: 's20', mode: 'singles', cat: 'ito', lv: 2, who: 'A', type: 'shot',
+  title: '余裕があるなら攻める',
+  ask: 'A は、どう打つ？',
+  scene: 'C のクリアが少し浅い。A は余裕をもって、シャトルの後ろに入れた。C はまん中にいる。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.6, 2.0], a: 3.0, mv: { C: [0.0, 10.1] } } ],
+  think: ['打点：高い。シャトルの後ろに入れて余裕がある', '相手：まん中。左右のサイドと前が空いている', 'だから：攻め。相手から遠い所へ'],
+  opts: [
+    { k: 'ア', at: [-1.9, 10.6], ok: true, shot: 'smash', label: 'スマッシュで、相手から遠いサイドへ',
+      why: '余裕があるときは攻める番。相手から遠いサイドへ打てば、返球が甘くなり、次で決められる。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.9, 10.6], mv: { A: [0.1, 3.4] } }, { hit: 'C', shot: 'block', to: [0.4, 5.6] }, { hit: 'A', shot: 'push', to: [1.9, 9.4] } ] },
+    { k: 'イ', at: [0.2, 12.9], shot: 'clear', label: 'とりあえず高いクリアで返す',
+      why: '高いクリアはまちがいではないが、せっかくの余裕を使っていない。相手はらくに返せて、ラリーが最初からになる。苦しいときのクリア（s04）とは場面がちがう。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.2, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [0.2, 12.9], text: 'らくに返せる' } }, { hit: 'C', shot: 'drop', to: [-1.4, 5.5], end: 0.6, mv: { A: [-1.4, 5.5] } } ] },
+    { k: 'ウ', at: [0.8, 11.4], shot: 'half', label: 'とりあえず相手の正面へ',
+      why: '考えずに相手の正面へ返すと、浅くなったとき相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.8, 11.4], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'チャンスボール' } } ] },
+  ],
+  theory: '余裕があるときは攻める。「とりあえずクリア」にしない',
+  drill: 'ノッカーが浅めのクリアを出す。シャトルの後ろに入れたら攻める（スマッシュかドロップ）、入れなかったら高いクリア、と打ち分ける。打つ前に「攻め！」「守り！」と声に出す。' },
+
+/* ----- シングルス：組み立て（v0.4 で追加。2本・3本の流れで崩してから攻める） ----- */
+{ id: 's21', mode: 'singles', cat: 'kumitate', lv: 1, who: 'A', type: 'plan',
+  title: '前後に動かす組み立て',
+  ask: 'どんな順番で打つ？',
+  scene: 'A は奥でクリアを受けた。相手の C はまん中にいる。1本で決めようとせず、崩してから決めたい。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.2, 1.4], mv: { C: [0.0, 10.1] } } ],
+  think: ['打点：奥で、余裕をもって打てる', '相手：まん中。前後にも左右にも動ける', 'だから：崩す。前後に大きく動かしてから攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① 奥へクリアで下げる → ② 前へドロップ',
+      why: '奥へ下げてから前へ。前後に動かすと、相手はコートの長さいっぱいを走り、返球が甘くなる。そこを攻めて決める。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.6, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [-0.3, 1.5], mv: { C: [0.5, 12.2] } }, { hit: 'A', shot: 'drop', to: [-1.4, 8.9], end: 0.4, mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.2] }, { hit: 'A', shot: 'smash', to: [1.8, 11.0] } ] },
+    { k: 'イ', label: '① 奥へクリア → ② また奥へクリア',
+      why: '同じ所に続けると、相手は待ちかまえて強く打ち返せる。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.6, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [-0.3, 1.5], mv: { C: [0.5, 12.2] } }, { hit: 'A', shot: 'clear', to: [0.6, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '待たれている' } } ] },
+    { k: 'ウ', label: '① いきなり、まん中へスマッシュ',
+      why: 'まん中の相手は、強いスマッシュでも動かずに返せる。1本で決めようとしない。',
+      then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.2], mv: { A: [0.2, 2.4] } }, { hit: 'C', shot: 'block', to: [1.6, 5.5], mark: { at: [1.6, 5.5], text: '空く' } } ] },
+  ],
+  theory: '1本で決めようとしない。前後に動かして、甘くなった球を攻める',
+  drill: 'クリア→ドロップの2本セットでラリーする。3本目が甘く上がったら攻め。セットの順番を相手に言わずに入れかえる。' },
+
+{ id: 's22', mode: 'singles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: '前に寄せて、対角の奥へ',
+  ask: 'どんな順番で打つ？',
+  scene: 'A は左前で、相手のドロップを取る。C はまん中。前と奥を使って、相手をいちばん長く走らせたい。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'drop', to: [-1.2, 5.6], mv: { C: [0.0, 10.1] } } ],
+  think: ['打点：白帯より少し下。ヘアピンなら沈められる', '相手：まん中', 'だから：崩す。前に寄せてから、対角の奥へ'],
+  opts: [
+    { k: 'ア', ok: true, label: '① 左前へヘアピン → ② 相手が上げたら、対角の右奥へ',
+      why: '前に寄せたら、次は対角の奥。前→対角の奥は、コートでいちばん長い距離。返球が甘くなったところを攻める。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.6, 8.9], mv: { A: [-0.6, 4.6] } }, { hit: 'C', shot: 'lob', to: [0.0, 2.2], mv: { C: [-1.2, 9.4] } }, { hit: 'A', shot: 'clear', to: [2.2, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.3] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.4] } ] },
+    { k: 'イ', label: '① 左前へヘアピン → ② 相手が上げたら、同じ側の左奥へ',
+      why: '同じ側の奥は、前からまっすぐ下がるだけで届く。走る距離が短い。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.6, 8.9], mv: { A: [-0.6, 4.6] } }, { hit: 'C', shot: 'lob', to: [0.0, 2.2], mv: { C: [-1.2, 9.4] } }, { hit: 'A', shot: 'clear', to: [-2.2, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [-2.2, 12.9], text: 'らくに届く' } }, { hit: 'C', shot: 'clear', to: [1.8, 1.1], end: 2.6, mv: { A: [1.8, 1.1] } } ] },
+    { k: 'ウ', label: '① 中ほどへ、ふわっとロブ',
+      why: '最初の1本が中途半端だと、組み立てる前に相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.3, 10.8] }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'チャンスボール' } } ] },
+  ],
+  theory: '前に寄せたら、対角の奥へ。いちばん長い距離を走らせる',
+  drill: 'ノッカーの前の球をヘアピン→次の球を対角の奥へクリア、の2本セット。左右を入れかえて5セットずつ。' },
+
+{ id: 's23', mode: 'singles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: '苦手を攻めて、甘い球を待つ',
+  ask: 'どんな順番で打つ？',
+  scene: '右利きの C は、バック奥（こちらから見て右奥）が苦手。A は奥でクリアを受けた。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.2, 1.4], mv: { C: [0.0, 10.1] } } ],
+  think: ['打点：奥で、余裕をもって打てる', '相手：右利き。バック奥からの返球は弱くなりやすい', 'だから：崩す。苦手なバック奥を攻めて、甘くなった球を攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① バック奥へクリア → ② 甘い返球をスマッシュで決める',
+      why: '苦手なバック奥を攻めると、返球が浅く弱くなる。甘い球が来たら、迷わず攻める。崩す→攻め、の2本。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.4] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.2] } ] },
+    { k: 'イ', label: '① バック奥へクリア → ② 甘い返球を、またクリアでつなぐ',
+      why: '崩したのにつなぐと、相手は体勢を立て直せる。崩したら攻める。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.4] }, { hit: 'A', shot: 'clear', to: [-0.4, 12.8], mark: { at: [-0.4, 12.8], text: 'チャンスを逃す' } }, { hit: 'C', shot: 'clear', to: [1.6, 1.2], end: 2.6, mv: { A: [1.6, 1.2] } } ] },
+    { k: 'ウ', label: '① フォア奥へクリア → ② 返球を待つ',
+      why: 'フォア奥は相手が強く打てる所。崩す球にならない。',
+      then: [ { hit: 'A', shot: 'clear', to: [-2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '強く打たれる' } } ] },
+  ],
+  theory: '苦手な所で崩して、甘くなったら攻める',
+  drill: 'バック奥へのクリアを続け、返球が浅くなったらスマッシュ、深ければもう一度バック奥。「崩す」「攻め」を声に出す。' },
+
+{ id: 's24', mode: 'singles', cat: 'kumitate', lv: 1, who: 'A', type: 'plan',
+  title: 'ネット前で上げさせて決める',
+  ask: 'どんな順番で打つ？',
+  scene: 'C のドロップを、A が右前で取る。打点は白帯より少し下。C はまん中にいる。',
+  start: { A: [0.0, 3.2], C: [0.0, 10.0] },
+  setup: [ { hit: 'C', shot: 'drop', to: [1.3, 5.7], end: 0.6, mv: { C: [0.0, 9.8] } } ],
+  think: ['打点：白帯より少し下。たたけないが、沈められる', '相手：まん中。ネット前が遠い', 'だから：崩す。ネット前に沈めて上げさせ、上がった球を攻める'],
+  opts: [
+    { k: 'ア', ok: true, label: '① 白帯すれすれのヘアピン → ② 上がってきた球をスマッシュ',
+      why: 'ネット前で勝てば、相手は下から上げるしかない。上がった球を攻めて決める。前で崩す→後ろから攻め、の2本。',
+      then: [ { hit: 'A', shot: 'net', to: [1.4, 8.9], mv: { A: [0.3, 4.6] } }, { hit: 'C', shot: 'lob', to: [-0.2, 2.4] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.6] } ] },
+    { k: 'イ', label: '① とりあえず強く打ち返す',
+      why: '白帯より下から強く打つと浮いて、相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'drive', to: [0.4, 9.6] }, { hit: 'C', shot: 'smash', to: [-1.9, 2.6], mark: { at: [-1.9, 2.6], text: 'チャンスボール' } } ] },
+    { k: 'ウ', label: '① ロブで奥へ上げる → ② 相手のスマッシュを守る',
+      why: '沈められるのに上げると、相手に攻める番を渡す。守りを選ぶ場面ではない。',
+      then: [ { hit: 'A', shot: 'lob', to: [0.3, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [1.9, 2.6], mark: { at: [1.9, 2.6], text: '守りが続く' } } ] },
+  ],
+  theory: 'ネット前で沈めて上げさせ、上がった球を攻める',
+  drill: 'ネット前の打ち合いから、上がった球は必ず攻める。「沈める→攻め」の2本を5セット。' },
+
+{ id: 's25', mode: 'singles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: '前に寄せてから、頭の上を越す',
+  ask: 'どんな順番で打つ？',
+  scene: 'C のドロップを、A が左前で取る。C は、A がネット前に返すと前に詰めてくる。',
+  start: { A: [0.0, 3.2], C: [0.0, 10.0] },
+  setup: [ { hit: 'C', shot: 'drop', to: [-1.2, 5.7], mv: { C: [0.0, 9.8] } } ],
+  think: ['打点：白帯の高さくらい。ヘアピンもロブも打てる', '相手：ネット前に詰めてくるくせがある', 'だから：崩す。前に寄せてから、頭の上を越して奥へ'],
+  opts: [
+    { k: 'ア', ok: true, label: '① ヘアピンで前に寄せる → ② 詰めてきたら、ロブで奥へ',
+      why: '前に寄せると、相手は前に詰めてくる。そのとき奥が空く。前に寄せる→頭の上を越す、で相手を前後に走らせる。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.4, 8.9], mv: { A: [-0.6, 4.8] } }, { hit: 'C', shot: 'net', to: [-1.0, 5.8] }, { hit: 'A', shot: 'lob', to: [1.9, 12.9] }, { hit: 'C', shot: 'half', to: [0.3, 3.0] }, { hit: 'A', shot: 'smash', to: [-1.8, 10.0] } ] },
+    { k: 'イ', label: '① ヘアピン → ② 詰めてきても、またヘアピン',
+      why: '詰めてきた相手にネット前を続けると、目の前でたたかれる。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.4, 8.9], mv: { A: [-0.6, 4.8] } }, { hit: 'C', shot: 'net', to: [-1.0, 5.8] }, { hit: 'A', shot: 'net', to: [-1.2, 7.4] }, { hit: 'C', shot: 'push', to: [1.6, 2.4], mark: { at: [1.6, 2.4], text: 'たたかれる' } } ] },
+    { k: 'ウ', label: '① 最初からロブで奥へ',
+      why: '相手がまん中にいるうちに上げても、らくに打たれる。先に前へ寄せてから上げる。',
+      then: [ { hit: 'A', shot: 'lob', to: [0.3, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'drop', to: [1.4, 5.5], end: 0.5, mv: { A: [1.4, 5.5] }, mark: { at: [0.3, 12.9], text: 'らくに打てる' } } ] },
+  ],
+  theory: '前に寄せてから、頭の上を越す',
+  drill: 'ネット前の打ち合いを続け、相手が詰めてきたら奥へロブ。ロブを上げたら、まん中へ戻って次を待つ。' },
+
+{ id: 's26', mode: 'singles', cat: 'kumitate', lv: 2, who: 'A', type: 'plan',
+  title: '守りから組み立て直す',
+  ask: 'どんな順番で打つ？',
+  scene: '相手の速いクリアで、A は左奥に追いこまれた。ここから、もう一度ラリーを組み立て直したい。',
+  start: { A: [-0.2, 3.0], C: [0.0, 10.2] },
+  setup: [ { hit: 'C', shot: 'aclear', to: [-2.2, 0.5], end: 1.8, mv: { C: [0.0, 10.0] } } ],
+  think: ['打点：低い。体の後ろで、追いこまれている', '相手：まん中で、次を攻めようと待っている', 'だから：守り。高く深く返して立て直し、次の球から崩す'],
+  opts: [
+    { k: 'ア', ok: true, label: '① 高く深いクリアで守る → ② まん中に戻り、次の球をドロップで崩す',
+      why: '苦しいときは、まず守りで立て直す。高く深く返せば、まん中に戻る時間ができる。そこから崩して攻める。守り→崩す→攻め、の順。',
+      then: [ { hit: 'A', shot: 'clear', to: [-1.2, 12.8], mv: { A: [0.0, 3.0] }, mark: { at: [0.0, 3.0], text: '立て直せた' } }, { hit: 'C', shot: 'clear', to: [0.6, 1.6] }, { hit: 'A', shot: 'drop', to: [1.5, 8.9], end: 0.4 }, { hit: 'C', shot: 'half', to: [0.2, 3.2] }, { hit: 'A', shot: 'smash', to: [-1.9, 10.6] } ] },
+    { k: 'イ', label: '① 苦しいまま、スマッシュで攻める',
+      why: '苦しい体勢からの攻めは球に力がなく、前に落とされて終わる。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.0, 10.6], mv: { A: [-1.6, 1.3] } }, { hit: 'C', shot: 'block', to: [1.5, 5.5], mv: { A: [-0.8, 2.2] }, mark: { at: [1.5, 5.5], text: '空く' } } ] },
+    { k: 'ウ', label: '① 低く速いクリアで、早く返す',
+      why: '低く速いクリアは、自分も戻る時間がない。苦しいときこそ高く。',
+      then: [ { hit: 'A', shot: 'aclear', to: [-0.8, 12.4], mv: { A: [-1.2, 2.0] } }, { hit: 'C', shot: 'smash', to: [1.8, 2.6], mark: { at: [1.8, 2.6], text: '戻る時間がない' } } ] },
+  ],
+  theory: '苦しいときは守りで立て直し、次の球から組み立てる',
+  drill: 'ノッカーが速いクリアで追いこむ。高く深く返したら、次の球で必ず「崩す」球（ドロップかヘアピン）を打つ。守り→崩すの2本セット。' },
+
+{ id: 's27', mode: 'singles', cat: 'kumitate', lv: 2, who: 'A', type: 'shot',
+  title: '崩したあとの決め球',
+  ask: '決めるのは、どこ？',
+  scene: 'A のクリアで、C は左奥へ走らされ、浅い球を上げた。C はまだ左奥寄りにいて、まん中へ戻ろうとしている。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'A', shot: 'clear', to: [-2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.4, 3.2], mv: { C: [-1.4, 12.0] } } ],
+  think: ['打点：高い。チャンスボール', '相手：左奥寄り。まん中に戻ろうとしている', 'だから：攻め。相手から遠い右へ決める'],
+  opts: [
+    { k: 'ア', at: [1.9, 10.4], ok: true, shot: 'smash', label: '相手から遠い、右のサイド',
+      why: '崩したあとは、相手から遠い所へ決める。相手が戻ってくる所（まん中）には打たない。',
+      then: [ { hit: 'A', shot: 'smash', to: [1.9, 10.4], mv: { C: [0.0, 10.8] } } ] },
+    { k: 'イ', at: [-1.9, 11.0], shot: 'smash', label: '相手のいる左奥',
+      why: '相手のいる側に打つと、強いスマッシュでも届いて返される。',
+      then: [ { hit: 'A', shot: 'smash', to: [-1.9, 11.0] }, { hit: 'C', shot: 'block', to: [1.5, 5.6], mark: { at: [1.5, 5.6], text: '空く' } } ] },
+    { k: 'ウ', at: [0.0, 10.6], shot: 'smash', label: 'まん中',
+      why: 'まん中は、相手が戻ろうとしている所。戻りながら取られてしまう。',
+      then: [ { hit: 'A', shot: 'smash', to: [0.0, 10.6], mv: { C: [-0.6, 11.2] } }, { hit: 'C', shot: 'block', to: [-1.4, 5.6], mark: { at: [-1.4, 5.6], text: '戻る所に打った' } } ] },
+  ],
+  theory: '決め球は、相手から遠い所へ。戻る所（まん中）に打たない',
+  drill: 'ノッカーが四すみに上げる。打つ前に相手役の位置を見て、遠いほうへスマッシュ。相手役は戻りながら取りにいく。' },
+
+{ id: 's28', mode: 'singles', cat: 'kumitate', lv: 3, who: 'A', type: 'shot',
+  title: '大きく動いた相手の逆をつく',
+  ask: 'A は、どこへ打つ？',
+  scene: 'C は左前（こちらから見て）からロブを上げ、すぐに右奥のほうへ大きく下がった。',
+  start: { A: [0.1, 4.4], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'net', to: [-1.9, 8.9], end: 0.5, mv: { A: [0.0, 3.2] } }, { hit: 'C', shot: 'lob', to: [0.3, 1.8], mv: { C: [0.6, 11.2] } } ],
+  think: ['打点：高い。奥から余裕をもって打てる', '相手：右奥へ大きく下がった。さっきの左前が空いている', 'だから：崩す。相手が下がった逆、左前へ落とす'],
+  opts: [
+    { k: 'ア', at: [-1.6, 8.9], ok: true, shot: 'drop', label: 'さっきの左前へドロップ（逆をつく）',
+      why: '相手が大きく下がったら、その逆へ。さっきまでいた前が、いちばん遠くなっている。前に動かした相手がまだ前にいるとき（s03）とは逆の答えになる。見るのは相手の動き。',
+      then: [ { hit: 'A', shot: 'drop', to: [-1.6, 8.9], end: 0.3, mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.2, 3.2] }, { hit: 'A', shot: 'smash', to: [1.9, 10.8] } ] },
+    { k: 'イ', at: [2.1, 12.8], shot: 'clear', label: '対角の右奥へクリア',
+      why: '相手が下がっていった先に打つと、待たれている。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] }, mark: { at: [2.1, 12.8], text: '待たれている' } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4] } ] },
+    { k: 'ウ', at: [-0.4, 10.4], shot: 'half', label: 'まん中へ浅く',
+      why: '中途半端な球は、相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'half', to: [-0.4, 10.4] }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'チャンスボール' } } ] },
+  ],
+  theory: '相手が大きく動いたら、その逆をつく。見るのは相手の動き',
+  drill: 'ノッカー役がロブのあと、わざと大きく下がったり、前に残ったりする。打つ人は相手役の動きを見て、前か奥かを打ち分ける。' },
+
+{ id: 's29', mode: 'singles', cat: 'kumitate', lv: 1, who: 'A', type: 'plan',
+  title: '左右に動かす組み立て',
+  ask: 'どんな順番で打つ？',
+  scene: 'A は奥でクリアを受けた。相手の C はまん中。左右に動かして、空いた所を作りたい。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.2, 1.4], mv: { C: [0.0, 10.1] } } ],
+  think: ['打点：奥で、余裕をもって打てる', '相手：まん中。左右どちらにも動ける', 'だから：崩す。左右に大きく動かして、戻りきれない所を作る'],
+  opts: [
+    { k: 'ア', ok: true, label: '① 右奥へクリア → ② 戻りきる前に、左奥へ',
+      why: '左右に大きく動かすと、相手は戻りきれない。空いた側の甘い球を攻める。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [0.0, 1.6], mv: { C: [1.3, 11.6] } }, { hit: 'A', shot: 'clear', to: [-2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [0.3, 3.2] }, { hit: 'A', shot: 'smash', to: [1.9, 10.6] } ] },
+    { k: 'イ', label: '① 右奥へクリア → ② また右奥へ',
+      why: '同じ所に続けると、相手は待ちかまえて強く打てる。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'clear', to: [0.0, 1.6], mv: { C: [1.3, 11.6] } }, { hit: 'A', shot: 'clear', to: [2.1, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: '待たれている' } } ] },
+    { k: 'ウ', label: '① まん中の奥へクリア → ② またまん中へ',
+      why: 'まん中への球は、相手が動かずに打てる。崩す球にならない。',
+      then: [ { hit: 'A', shot: 'clear', to: [0.0, 12.8], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'smash', to: [1.9, 2.4], mark: { at: [1.9, 2.4], text: 'らくに攻められる' } } ] },
+  ],
+  theory: '左右に動かして、戻りきれない所を作る',
+  drill: '左右の奥へ交互にクリアを打つラリー。返球が浅くなったら攻め。慣れたら、ときどき同じ側へ続けて逆をつく。' },
+
+/* ----- シングルス：配球・苦しいとき・左右反転（v0.4 で追加） ----- */
+{ id: 's30', mode: 'singles', cat: 'haikyu', lv: 1, who: 'A', type: 'shot',
+  title: 'ドロップはどこに落とす',
+  ask: 'A のドロップは、どこに落とす？',
+  scene: 'A は奥から、ドロップで相手を前に動かしたい。C はまん中にいる。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.1] },
+  setup: [ { hit: 'C', shot: 'clear', to: [0.2, 1.4], mv: { C: [0.0, 10.4] } } ],
+  think: ['打点：奥で、余裕をもって打てる', '相手：まん中', 'だから：崩す。ネットのすぐ前に落として、相手を前まで走らせる'],
+  opts: [
+    { k: 'ア', at: [-1.3, 8.4], ok: true, shot: 'drop', label: 'ネットのすぐ前（ショートサービスラインより前）',
+      why: 'ドロップはネットのすぐ前に。相手は前まで走り、低い所で取るしかない。',
+      then: [ { hit: 'A', shot: 'drop', to: [-1.3, 8.4], end: 0.3, mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'lob', to: [0.2, 2.0], end: 2.6, mv: { A: [0.2, 2.0] } } ] },
+    { k: 'イ', at: [-1.0, 9.8], shot: 'drop', label: 'ショートサービスラインより後ろ（中ほど）',
+      why: '中ほどに落ちるドロップは、相手が一歩でたたける。崩す球にならない。',
+      then: [ { hit: 'A', shot: 'drop', to: [-0.9, 9.6], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'push', to: [1.8, 2.6], mark: { at: [1.8, 2.6], text: 'たたかれる' } } ] },
+    { k: 'ウ', at: [-2.5, 8.6], shot: 'drop', label: 'サイドラインぎりぎりの前',
+      why: 'サイドぎりぎりは、少しずれるとアウト。ねらうのは内側。',
+      then: [ { hit: 'A', shot: 'drop', to: [-2.75, 8.5], out: true, mv: { A: [0.0, 3.0], C: [-1.6, 9.2] }, mark: { at: [-2.75, 8.5], text: 'アウト' } } ] },
+  ],
+  theory: 'ドロップはネットのすぐ前、線の内側に',
+  drill: 'ショートサービスラインより前に、テープで四角を作る。奥からのドロップを10本、四角の中に入れる。' },
+
+{ id: 's31', mode: 'singles', cat: 'kurushii', lv: 2, who: 'A', type: 'shot',
+  title: '遅れたときのヘアピンの向き',
+  ask: 'A のヘアピンは、どちらへ？',
+  scene: 'C のドロップに、A は右前で少し遅れて届いた。ヘアピンで返す。C はまん中より前にいる。',
+  start: { A: [0.0, 3.0], C: [0.0, 10.0] },
+  setup: [ { hit: 'C', shot: 'drop', to: [1.6, 5.7], end: 0.5, a: 0.4, t: 0.85, mv: { C: [-0.2, 9.4] } } ],
+  think: ['打点：白帯より下。少し遅れている', '相手：まん中より前で、ネット前を待っている', 'だから：崩す。距離の短いストレートで、白帯すれすれに沈める'],
+  opts: [
+    { k: 'ア', at: [1.5, 7.3], ok: true, shot: 'net', label: 'ストレートのヘアピン',
+      why: '遅れたときは、距離の短いストレートへ。ネットを越えるまでが短く、浮きにくい。',
+      then: [ { hit: 'A', shot: 'net', to: [1.5, 7.3] }, { hit: 'C', shot: 'lob', to: [0.3, 2.2], end: 2.6, mv: { A: [0.3, 2.2] } } ] },
+    { k: 'イ', at: [-1.7, 7.4], shot: 'net', label: 'クロスのヘアピン',
+      why: 'クロスは距離が長く、相手が待つ所を通る。遅れて打つと、途中でたたかれる。',
+      then: [ { hit: 'A', shot: 'net', to: [-1.0, 7.6] }, { hit: 'C', shot: 'push', to: [1.9, 3.0], mark: { at: [1.9, 3.0], text: '途中でたたかれる' } } ] },
+    { k: 'ウ', at: [0.6, 10.8], shot: 'half', label: 'ふわっと、中ほどへ',
+      why: '中途半端な高さは、相手のチャンスボールになる。',
+      then: [ { hit: 'A', shot: 'half', to: [0.6, 10.8] }, { hit: 'C', shot: 'smash', to: [-1.9, 2.4], mark: { at: [-1.9, 2.4], text: 'チャンスボール' } } ] },
+  ],
+  theory: '遅れたときのヘアピンは、ストレートへ',
+  drill: 'ノッカーが速いドロップを左右に出す。遅れたらストレート、間に合ったらクロスも使う、と打ち分ける。' },
+
+{ id: 's32', mode: 'singles', cat: 'home', lv: 3, who: 'A', type: 'move',
+  title: '相手の打つ位置で構えを変える（左奥）',
+  ask: 'A は、どこに構える？',
+  scene: 'A のクリアで、相手の C は左奥（こちらから見て）に下がった。C がスマッシュを打ってくる。',
+  start: { A: [0.4, 3.0], C: [-0.3, 10.4] },
+  setup: [ { hit: 'A', shot: 'clear', to: [-2.0, 12.6], mv: { A: [0.3, 3.0] } } ],
+  opts: [
+    { k: 'ア', at: [-0.4, 3.1], ok: true, label: 'まん中から少し左（ストレート側）',
+      why: '相手の打つ位置に合わせて、まん中から少しずれる。左奥から打つなら、速いストレートが来る左へ半歩。クロスは距離が長いので間に合う。',
+      then: [ { mv: { A: [-0.4, 3.1] }, t: 0.5 }, { hit: 'C', shot: 'smash', to: [-1.6, 3.0] }, { hit: 'A', shot: 'block', to: [-1.4, 8.9] } ] },
+    { k: 'イ', at: [0.8, 3.1], label: 'まん中から右（クロス側）',
+      why: 'クロス側に寄ると、いちばん速いストレートのスマッシュに届かない。',
+      then: [ { mv: { A: [0.8, 3.1] }, t: 0.5 }, { hit: 'C', shot: 'smash', to: [-1.9, 3.0], mv: { A: [-0.3, 3.0] }, mark: { at: [-1.9, 3.0], text: '空く' } } ] },
+    { k: 'ウ', at: [-0.2, 1.4], label: '後ろへ下がる',
+      why: '下がりすぎると、ドロップで前に落とされる。',
+      then: [ { mv: { A: [-0.2, 1.4] }, t: 0.5 }, { hit: 'C', shot: 'drop', to: [-1.0, 5.5], mv: { A: [-0.5, 3.2] }, mark: { at: [-1.0, 5.5], text: '空く' } } ] },
+  ],
+  theory: '構える位置は、相手の打つ位置で変わる。ストレート側に少し寄る',
+  drill: 'ノッカーが左奥・右奥から打つ。打つ前に、ストレート側へ半歩寄って構える。ノッカーはストレートとクロスをまぜる。' },
+
+{ id: 's33', mode: 'singles', cat: 'haikyu', lv: 2, who: 'A', type: 'shot',
+  title: '対角線で走らせる（右前から）',
+  ask: '相手をいちばん長く走らせるには？',
+  scene: 'A のヘアピンで、C を右前（こちらから見て）に動かした。C はロブを上げて、まん中へ戻ろうとしている。',
+  start: { A: [-0.1, 4.6], C: [0.0, 10.0] },
+  setup: [ { hit: 'A', shot: 'net', to: [1.9, 8.9], mv: { A: [0.0, 3.6] } }, { hit: 'C', shot: 'lob', to: [-0.3, 1.8], mv: { C: [1.4, 9.5] } } ],
+  opts: [
+    { k: 'ア', at: [-2.2, 12.9], ok: true, shot: 'clear', label: '対角の奥（左奥）',
+      why: '前に動かしたら、対角の奥へ。いちばん遠いのは対角線。返球が甘くなったところを決める。',
+      then: [ { hit: 'A', shot: 'clear', to: [-2.2, 12.9], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'half', to: [-0.4, 3.4] }, { hit: 'A', shot: 'smash', to: [1.8, 10.2] } ] },
+    { k: 'イ', at: [2.2, 12.9], shot: 'clear', label: '同じ側の奥（右奥）',
+      why: '同じ側の奥は、前からまっすぐ下がるだけで届く。走る距離が短い。',
+      then: [ { hit: 'A', shot: 'clear', to: [2.2, 12.9], mv: { A: [0.0, 3.0] }, mark: { at: [2.2, 12.9], text: 'らくに届く' } }, { hit: 'C', shot: 'clear', to: [-1.8, 1.2], end: 2.6, mv: { A: [-1.8, 1.2] } } ] },
+    { k: 'ウ', at: [0.9, 8.3], shot: 'drop', label: 'もう一度、右前へ',
+      why: 'C はまだ前の近くにいる。同じ前に落としても、すぐ届いてたたかれる。',
+      then: [ { hit: 'A', shot: 'drop', to: [0.9, 8.3], mv: { A: [0.0, 3.0] } }, { hit: 'C', shot: 'push', to: [-2.0, 2.2], mark: { at: [-2.0, 2.2], text: 'たたかれる' } } ] },
+  ],
+  theory: '前に動かしたら、対角の奥へ。いちばん遠いのは対角線',
+  drill: '「前→対角の奥」の2球セット練習。ノッカーが前に出した球をヘアピン、次の球を対角の奥へクリア。左右を入れかえて5セット。' },
+];
+const QMAP = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
+let FAST = false;   // 検証用：true にするとアニメーションを飛ばす（BD.fast()）
+
+/* ---------- [S3] Store：アプリの状態 ---------- */
+const Store = {
+  view: 'home', mode: 'doubles',
+  set: [], i: 0, res: {}, q: null,
+  base: null, setupTL: null, after: null, afterTrails: [],
+  phase: 'setup', answered: false, chosen: null, playingKey: null, askAt: 0,
+};
+
+/* ---------- [S4] Progress：端末に残す記録（localStorage） ---------- */
+const Progress = {
+  KEY: 'bado-drill-v1',
+  data: { q: {}, mode: 'doubles', slow: false, today: { ids: {}, last: {} } },
+  load() {
+    try {
+      const s = localStorage.getItem(this.KEY);
+      if (s) { const d = JSON.parse(s); if (d && typeof d === 'object') this.data = Object.assign({ q: {}, mode: 'doubles', slow: false }, d); }
+      const t = this.data.today;
+      this.data.today = { ids: (t && t.ids) || {}, last: (t && t.last) || {} };
+    } catch (e) { console.warn('記録を読めませんでした: ' + e.message); }
+  },
+  save() { try { localStorage.setItem(this.KEY, JSON.stringify(this.data)); } catch (e) { console.warn('記録を保存できませんでした: ' + e.message); } },
+  record(id, ok) {
+    const r = this.data.q[id] || { n: 0, best: false };
+    r.n++; r.last = ok; r.best = r.best || ok;
+    this.data.q[id] = r; this.save();
+  },
+  get(id) { return this.data.q[id] || null; },
+  reset() { this.data.q = {}; this.data.today = { ids: {}, last: {} }; this.save(); },
+};
+
+/* ---------- [S5] コートの描画（透視投影・SVG） ---------- */
+const CAM = (() => {
+  const back = 6, H = 16, th = Math.atan2(H, 6.7 + back);   // カメラは自分たちのバックラインの 6m 後ろ・高さ 16m から、ネットの下を見る
+  const c = Math.cos(th), s = Math.sin(th);
+  return { back, H, c, s, z0: back * c + H * s, F: 1600, cx: 400, cy: 540 };
+})();
+/** コートの点 (x, y, 見せる高さ) → 画面 [sx, sy, 手前を1とした大きさ] */
+function proj(x, y, h = 0) {
+  const ry = y + CAM.back, rz = h - CAM.H;
+  const z = ry * CAM.c - rz * CAM.s;
+  const v = ry * CAM.s + rz * CAM.c;
+  return [CAM.cx + CAM.F * x / z, CAM.cy - CAM.F * v / z, CAM.z0 / z];
+}
+const pt = p => f1(p[0]) + ',' + f1(p[1]);
+const quad = (x0, y0, x1, y1, h = 0) => [proj(x0, y0, h), proj(x1, y0, h), proj(x1, y1, h), proj(x0, y1, h)].map(pt).join(' ');
+
+const Court = {
+  svg: null, mode: null,
+  init() {
+    this.svg = $('#court');
+    this.svg.innerHTML = '<g id="g-static"></g><g id="g-ground"></g><g id="g-far"></g><g id="g-net"></g><g id="g-near"></g><g id="g-air"></g>';
+    this.g = { st: $('#g-static'), ground: $('#g-ground'), far: $('#g-far'), net: $('#g-net'), near: $('#g-near'), air: $('#g-air') };
+    this.drawNet();
+  },
+  setMode(mode) {
+    if (this.mode === mode) return;
+    this.mode = mode;
+    const W = 3.05, S = 2.59, L = 13.4, LW = 0.025;
+    let s = `<rect width="800" height="1140" fill="#2b4d3f"/>`;
+    s += `<polygon points="${quad(-3.8, -0.8, 3.8, 14.2)}" fill="#29684d"/>`;
+    s += `<polygon points="${quad(-W, 0, W, L)}" fill="#2f7d58"/>`;
+    if (mode === 'singles') s += `<polygon points="${quad(S, 0, W, L)}" fill="rgba(0,0,0,.2)"/><polygon points="${quad(-W, 0, -S, L)}" fill="rgba(0,0,0,.2)"/>`;
+    const lines = [];
+    [-W, -S, S, W].forEach(x => lines.push(quad(x - LW, 0, x + LW, L)));
+    [0, 0.76, 4.72, 8.68, 12.64, L].forEach(y => lines.push(quad(-W, y - LW, W, y + LW)));
+    lines.push(quad(-LW, 0, LW, 4.72), quad(-LW, 8.68, LW, L));
+    s += lines.map(p => `<polygon points="${p}" fill="#f4f6f2"/>`).join('');
+    this.g.st.innerHTML = s;
+  },
+  drawNet() {
+    const W = 3.05, lo = 0.79 * HS, hi = 1.55 * HS;
+    let s = `<polygon points="${[proj(-W, 6.7, lo), proj(W, 6.7, lo), proj(W, 6.7, hi), proj(-W, 6.7, hi)].map(pt).join(' ')}" fill="rgba(255,255,255,.16)"/>`;
+    for (let x = -W + 0.3; x < W; x += 0.3) s += `<line x1="${f1(proj(x, 6.7, lo)[0])}" y1="${f1(proj(x, 6.7, lo)[1])}" x2="${f1(proj(x, 6.7, hi)[0])}" y2="${f1(proj(x, 6.7, hi)[1])}" stroke="rgba(255,255,255,.22)" stroke-width="1"/>`;
+    const a = proj(-W, 6.7, hi), b = proj(W, 6.7, hi);
+    s += `<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#fff" stroke-width="4"/>`;
+    [-W, W].forEach(x => { const p = proj(x, 6.7, 0), q = proj(x, 6.7, hi); s += `<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(q[0])}" y2="${f1(q[1])}" stroke="#e2e2e2" stroke-width="6" stroke-linecap="round"/>`; });
+    this.g.net.innerHTML = s;
+  },
+  /** 1コマ描く。fr = frameAt() の戻り値、o = { who, rings } */
+  draw(fr, o = {}) {
+    let ground = '';
+    if (o.rings) ground += o.rings.map(ringSVG).join('');
+    if (fr.land) ground += landSVG(fr.land);
+    if (fr.sh && fr.sh.h > 0.05) ground += shadowSVG(fr.sh);
+    const ids = Object.keys(fr.pos).sort((a, b) => fr.pos[b][1] - fr.pos[a][1]);
+    let far = '', near = '';
+    ids.forEach(id => { const svg = pinSVG(id, fr.pos[id]); if (fr.pos[id][1] > 6.7) far += svg; else near += svg; });
+    let air = fr.trails.map((tr, i) => trailSVG(tr, i === fr.trails.length - 1 && !tr.past)).join('');
+    if (fr.sh) air += shuttleSVG(fr.sh);
+    air += fr.marks.map(markSVG).join('');
+    if (o.who && fr.pos[o.who]) air += youSVG(fr.pos[o.who]);
+    this.g.ground.innerHTML = ground; this.g.far.innerHTML = far; this.g.near.innerHTML = near; this.g.air.innerHTML = air;
+  },
+};
+
+function pinSVG(id, p) {
+  const [gx, gy, s] = proj(p[0], p[1], 0), [hx, hy] = proj(p[0], p[1], 1.45);
+  const col = (id === 'A' || id === 'B') ? '#2459d6' : '#d33a3a';
+  return `<ellipse cx="${f1(gx)}" cy="${f1(gy)}" rx="${f1(24 * s)}" ry="${f1(9 * s)}" fill="rgba(0,0,0,.3)"/>`
+    + `<line x1="${f1(gx)}" y1="${f1(gy)}" x2="${f1(hx)}" y2="${f1(hy)}" stroke="${col}" stroke-width="${f1(11 * s)}" stroke-linecap="round"/>`
+    + `<circle cx="${f1(hx)}" cy="${f1(hy)}" r="${f1(27 * s)}" fill="${col}" stroke="#fff" stroke-width="${f1(4 * s)}"/>`
+    + `<text x="${f1(hx)}" y="${f1(hy + 11 * s)}" font-size="${f1(31 * s)}" fill="#fff">${id}</text>`;
+}
+function youSVG(p) {
+  const [hx, hy, s] = proj(p[0], p[1], 1.45);
+  const w = 96 * s, h = 34 * s, y = hy - 27 * s - h - 8 * s;
+  return `<rect x="${f1(hx - w / 2)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}" rx="4" fill="#ffd84d"/>`
+    + `<text x="${f1(hx)}" y="${f1(y + h * 0.74)}" font-size="${f1(24 * s)}" fill="#1b231f">あなた</text>`;
+}
+function ringSVG(r) {
+  const pts = [];
+  for (let i = 0; i < 32; i++) { const t = i / 32 * Math.PI * 2; pts.push(pt(proj(r.at[0] + Math.cos(t) * 0.55, r.at[1] + Math.sin(t) * 0.55))); }
+  const [cx, cy, s] = proj(r.at[0], r.at[1]);
+  const st = { idle: ['rgba(255,255,255,.16)', '#fff', '9 7'], ok: ['rgba(46,200,110,.42)', '#b9f5cf', ''], ng: ['rgba(235,80,60,.42)', '#ffc1b8', ''], dim: ['rgba(255,255,255,.06)', 'rgba(255,255,255,.45)', '9 7'] }[r.state];
+  const attrs = r.state === 'idle' ? ` role="button" tabindex="0" aria-label="${esc(r.k)}を選ぶ" style="cursor:pointer"` : '';
+  return `<g class="ring" data-k="${esc(r.k)}"${attrs}><polygon points="${pts.join(' ')}" fill="${st[0]}" stroke="${st[1]}" stroke-width="3.5" stroke-dasharray="${st[2]}"/>`
+    + `<text x="${f1(cx)}" y="${f1(cy + 13 * s)}" font-size="${f1(38 * s)}" fill="${r.state === 'dim' ? 'rgba(255,255,255,.55)' : '#fff'}">${esc(r.k)}</text></g>`;
+}
+function landSVG(p) {
+  const [x, y, s] = proj(p[0], p[1], 0);
+  return `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(20 * s)}" ry="${f1(8 * s)}" fill="none" stroke="#ffd84d" stroke-width="4"/>`;
+}
+function shadowSVG(sh) {
+  const [x, y, s] = proj(sh.x, sh.y, 0);
+  return `<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(8 * s)}" ry="${f1(3.2 * s)}" fill="rgba(0,0,0,.4)"/>`;
+}
+function shuttleSVG(sh) {
+  const [x, y, s] = proj(sh.x, sh.y, sh.h * HS);
+  return `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(10 * s)}" fill="#fff" stroke="#1b1b1b" stroke-width="${f1(2.4 * s)}"/><circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(3.6 * s)}" fill="#1b1b1b"/>`;
+}
+function trailSVG(tr, live) {
+  const n = 30, pts = [];
+  for (let i = 0; i <= n; i++) { const u = tr.u * i / n; const p = shotAt(tr.shot, u); pts.push(pt(proj(p.x, p.y, p.h * HS))); }
+  return `<polyline points="${pts.join(' ')}" fill="none" stroke="${live ? '#ffd84d' : 'rgba(255,255,255,.55)'}" stroke-width="${live ? 4 : 3}" stroke-dasharray="11 9" stroke-linecap="round"/>`;
+}
+function markSVG(m) {
+  const [x, y] = proj(m.at[0], m.at[1], 0);
+  const fs = 34, w = m.text.length * fs + 26, h = fs + 18, top = y - h - 18;
+  return `<rect x="${f1(x - w / 2)}" y="${f1(top)}" width="${f1(w)}" height="${h}" rx="5" fill="#15201b"/>`
+    + `<line x1="${f1(x)}" y1="${f1(top + h)}" x2="${f1(x)}" y2="${f1(y - 4)}" stroke="#15201b" stroke-width="4"/>`
+    + `<text x="${f1(x)}" y="${f1(top + h - 15)}" font-size="${fs}" fill="#fff">${esc(m.text)}</text>`;
+}
+
+/* ---------- [S6] 動きの組み立てと再生 ---------- */
+const firstHit = steps => (steps || []).find(s => s.hit) || null;
+
+/** 1打の軌道。ネットを越えるところが低すぎれば、山を持ち上げる */
+function makeShot(from, to, a) {
+  const [, y0, h0] = from, [, y1, h1] = to;
+  if ((y0 - 6.7) * (y1 - 6.7) < 0) {
+    const t = (6.7 - y0) / (y1 - y0), k = 4 * t * (1 - t), need = NET_CLEAR - lerp(h0, h1, t);
+    if (k > 0 && a * k < need) a = need / k;
+  }
+  return { from, to, a };
+}
+function shotAt(sh, u) {
+  return { x: lerp(sh.from[0], sh.to[0], u), y: lerp(sh.from[1], sh.to[1], u), h: lerp(sh.from[2], sh.to[2], u) + 4 * sh.a * u * (1 - u) };
+}
+
+/**
+ * 打ち合いの手順を、時間つきの区間に組み立てる。
+ * @param start {pos, sh}  始まりの立ち位置とシャトル
+ * @param steps 1打ずつの手順
+ * @param hint  この手順のあとに続く最初の1打（場面の最後のシャトルの高さと、受ける人の自動の動きに使う）
+ */
+function buildTimeline(start, steps, hint) {
+  let pos = clonePos(start.pos);
+  let sh = start.sh ? Object.assign({}, start.sh) : null;
+  const segs = []; let T = 0;
+  (steps || []).forEach((st, i) => {
+    const nxt = firstHit(steps.slice(i + 1)) || hint || null;
+    const mv = Object.assign({}, st.mv || {});
+    let shot = null, dur = st.t || 0.6;
+    if (st.hit) {
+      const S = SHOT[st.shot];
+      if (!S) throw new Error('球種がありません: ' + st.shot);
+      if (!pos[st.hit]) throw new Error('打つ人がいません: ' + st.hit);
+      const from = sh ? [sh.x, sh.y, sh.h] : [pos[st.hit][0], pos[st.hit][1], S.h0];
+      const h1 = st.end != null ? st.end : (nxt ? SHOT[nxt.shot].h0 : 0);
+      if (nxt && nxt.hit !== st.hit && !(nxt.hit in mv)) mv[nxt.hit] = st.to.slice();
+      shot = makeShot(from, [st.to[0], st.to[1], h1], st.a != null ? st.a : S.a);
+      dur = st.t || S.t;
+      sh = { x: st.to[0], y: st.to[1], h: h1 };
+    }
+    const to = clonePos(pos);
+    for (const k in mv) to[k] = mv[k].slice();
+    segs.push({ t0: T, dur, from: pos, to, shot, mark: st.mark || null, out: !!st.out });
+    T += dur + GAP; pos = to;
+  });
+  return { segs, total: segs.length ? T - GAP : 0, end: { pos, sh } };
+}
+
+function lerpPos(a, b, u) {
+  const o = {};
+  for (const k in b) { const p = a[k] || b[k]; o[k] = [lerp(p[0], b[k][0], u), lerp(p[1], b[k][1], u)]; }
+  return o;
+}
+/** 時刻 t のコマ。prefix は前の手順（場面）で残っている軌道 */
+function frameAt(tl, start, t, prefix) {
+  let pos = start.pos, sh = start.sh, land = null;
+  const trails = (prefix || []).map(s => ({ shot: s, u: 1, past: true }));
+  const marks = [];
+  for (const sg of tl.segs) {
+    if (t < sg.t0) break;
+    const u = sg.dur > 0 ? Math.min(1, (t - sg.t0) / sg.dur) : 1;
+    pos = u >= 1 ? sg.to : lerpPos(sg.from, sg.to, ease(u));
+    if (sg.shot) {
+      sh = shotAt(sg.shot, u);
+      trails.forEach(tr => tr.past = true);
+      trails.push({ shot: sg.shot, u, past: false });
+      land = (u >= 1 && sg.shot.to[2] === 0) ? sg.shot.to : null;
+    }
+    if (u >= 1 && sg.mark) marks.push(sg.mark);
+    if (u < 1) break;
+  }
+  return { pos, sh, trails, marks, land };
+}
+
+const Anim = {
+  run: 0, raf: 0, slow: false, skip: false, playing: false,
+  /** tl を最初から再生する。途中で別の再生が始まったら false で終わる */
+  play(tl, start, prefix, draw) {
+    const my = ++this.run;
+    cancelAnimationFrame(this.raf);
+    this.skip = false;
+    return new Promise(resolve => {
+      if (FAST || tl.total <= 0) { draw(frameAt(tl, start, tl.total + 1, prefix)); this.playing = false; resolve(true); return; }
+      this.playing = true;
+      let t = -LEAD, last = null;
+      const tick = now => {
+        if (my !== this.run) { resolve(false); return; }
+        if (last != null) t += Math.min(0.25, (now - last) / 1000) / (this.slow ? SLOW : 1);   // 遅い端末でもコマ落ちするだけで、速さは変えない
+        last = now;
+        if (this.skip) t = tl.total + 1;
+        draw(frameAt(tl, start, t, prefix));
+        if (t >= tl.total) { this.playing = false; resolve(true); }
+        else this.raf = requestAnimationFrame(tick);
+      };
+      this.raf = requestAnimationFrame(tick);
+    });
+  },
+  stop() { this.run++; cancelAnimationFrame(this.raf); this.playing = false; },
+};
+
+/* ---------- [S8] ルーティング（画面の表示/非表示はここだけ） ---------- */
+function show(view) {
+  ['home', 'quiz', 'result'].forEach(v => { $('#view-' + v).hidden = v !== view; });
+  Store.view = view;
+  if (view !== 'quiz') Anim.stop();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- [S9] ホーム ---------- */
+/*
+ * 今日の10問：毎回ちがう10問を、重みつきのくじで選ぶ。
+ *   まちがえた問題（最後の答えが×）… 重み 3
+ *   まだ解いていない問題          … 重み 1.5
+ *   正解した問題                  … 重み 1
+ *   前回の今日の10問に出て、正解した問題 … 上の重み × 0.25（続けて同じ問題が出にくい）
+ *   前回まちがえた問題は、出にくくしない（すぐ後の10問にも、多めに出る）
+ * まちがえた問題は10問のうち半分（5問）まで。ほかの場面もまざるようにするため。
+ */
+const TODAY = { n: 10, missW: 3, newW: 1.5, okW: 1, prevW: 0.25, missCap: 5 };
+/** ホーム画面から開いていないスマホか（そのときだけ「ホーム画面に追加」の案内を出す） */
+const showA2HS = () => { try { return !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) && matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } };
+const localDate = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/** @returns {string[]} 選んだ問題の id（★の低い順。同じ★の中はばらばら） */
+function pickToday(mode, rand = Math.random) {
+  const prev = new Set(Progress.data.today.ids[mode] || []);
+  const pool = QUESTIONS.filter(q => q.mode === mode).map(q => {
+    const r = Progress.get(q.id), miss = !!(r && r.last === false);
+    let w = miss ? TODAY.missW : !r ? TODAY.newW : TODAY.okW;
+    if (prev.has(q.id) && !miss) w *= TODAY.prevW;
+    return { q, w, miss, tie: rand() };
+  });
+  const out = []; let missN = 0;
+  while (out.length < TODAY.n && pool.length) {
+    const open = pool.filter(p => !(p.miss && missN >= TODAY.missCap));
+    const list = open.length ? open : pool;
+    let x = rand() * list.reduce((a, p) => a + p.w, 0), pick = list[list.length - 1];
+    for (const p of list) { x -= p.w; if (x <= 0) { pick = p; break; } }
+    out.push(pick); if (pick.miss) missN++;
+    pool.splice(pool.indexOf(pick), 1);
+  }
+  return out.sort((a, b) => a.q.lv - b.q.lv || a.tie - b.tie).map(p => p.q.id);
+}
+
+const byLevel = (a, b) => a.lv - b.lv || QUESTIONS.indexOf(a) - QUESTIONS.indexOf(b);
+
+function renderHome() {
+  const mode = Store.mode;
+  document.querySelectorAll('.tab').forEach(t => { const on = t.dataset.mode === mode; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); });
+  const qs = QUESTIONS.filter(q => q.mode === mode);
+  const miss = qs.filter(q => { const r = Progress.get(q.id); return r && r.last === false; });
+  const last = Progress.data.today.last[mode];
+  const cats = CATS[mode].map(c => {
+    const list = qs.filter(q => q.cat === c.id);
+    const done = list.filter(q => { const r = Progress.get(q.id); return r && r.best; }).length;
+    const lvs = list.map(q => q.lv), lo = Math.min(...lvs), hi = Math.max(...lvs);
+    const lvText = '★'.repeat(lo) + (hi > lo ? '〜' + '★'.repeat(hi) : '');
+    return `<li><button data-start="cat:${c.id}">
+      <span class="c-name">${esc(c.name)}</span>
+      <span class="c-desc">${esc(c.desc)}</span>
+      <span class="c-prog"><b>${done}</b> / ${list.length} 正解<br>${lvText}</span>
+    </button></li>`;
+  }).join('');
+  $('#home-body').innerHTML = `
+    <div class="start-row">
+      <button class="btn primary" data-start="today">今日の10問<small>まちがえた問題が多めに出る</small></button>
+      <button class="btn" data-start="all">通しで解く<small>${qs.length}問</small></button>
+      <button class="btn" data-start="miss" ${miss.length ? '' : 'disabled'}>まちがえた問題<small>${miss.length}問</small></button>
+    </div>
+    ${showA2HS() ? '<p class="a2hs">スマホは「ホーム画面に追加」して開くと、記録が消えにくくなります（iPhone：共有ボタン →「ホーム画面に追加」）</p>' : ''}
+    ${last ? `<p class="today-last">前回の今日の10問：<b>${last.score}</b> / ${last.total}（${Number(last.at.slice(5, 7))}/${Number(last.at.slice(8, 10))}）</p>` : ''}
+    <p class="h3">場面で選ぶ</p>
+    <ul class="cats">${cats}</ul>
+    <p class="legend"><span><span class="dot blue"></span>自分たち（A・B）</span><span><span class="dot red"></span>相手（C・D）</span><span>全員右利きの想定</span></p>`;
+}
+
+function startFrom(key) {
+  const qs = QUESTIONS.filter(q => q.mode === Store.mode);
+  let list;
+  if (key === 'today') {
+    const ids = pickToday(Store.mode);
+    Progress.data.today.ids[Store.mode] = ids; Progress.save();   // 始めた時点で「前回の10問」にする（途中でやめても、次は別の10問）
+    console.log(`今日の10問（${Store.mode}）: ${ids.join(' ')}`);
+    startSet(ids, 'today');
+    return;
+  }
+  if (key === 'all') list = qs.slice().sort(byLevel);
+  else if (key === 'miss') list = qs.filter(q => { const r = Progress.get(q.id); return r && r.last === false; }).sort(byLevel);
+  else list = qs.filter(q => q.cat === key.slice(4)).sort(byLevel);
+  if (list.length) startSet(list.map(q => q.id));
+}
+function startSet(ids, kind = 'set') {
+  Store.set = ids; Store.i = 0; Store.res = {}; Store.kind = kind;
+  show('quiz');
+  Quiz.load(ids[0]);
+}
+
+/* ---------- [S10] 問題を解く ---------- */
+const okOpt = q => q.opts.find(o => o.ok);
+const catName = q => (CATS[q.mode].find(c => c.id === q.cat) || {}).name || '';
+
+const Quiz = {
+  load(id) {
+    const q = QMAP[id];
+    if (!q) { console.error('問題が見つかりません: ' + id); return; }
+    Object.assign(Store, { q, answered: false, chosen: null, playingKey: null });
+    Court.setMode(q.mode);
+    Store.base = { pos: clonePos(q.start), sh: q.sh ? { x: q.sh[0], y: q.sh[1], h: q.sh[2] } : null };
+    Store.setupTL = buildTimeline(Store.base, q.setup, firstHit(okOpt(q).then));
+    Store.after = Store.setupTL.end;
+    Store.afterTrails = Store.setupTL.segs.filter(s => s.shot).map(s => s.shot);
+    $('#q-count').textContent = `${Store.i + 1} / ${Store.set.length}`;
+    $('#q-tag').textContent = `${q.mode === 'doubles' ? 'ダブルス' : 'シングルス'}｜${catName(q)}`;
+    $('#q-lv').textContent = STARS[q.lv];
+    $('#q-ask').textContent = q.ask;
+    $('#q-scene').textContent = q.scene;
+    Store.setupDone = this.playSetup();
+  },
+  rings() {
+    const q = Store.q;
+    if (Store.phase === 'setup' || q.type === 'plan') return null;   // 組み立ては2本以上の流れなので、円1つでは表せない
+    return q.opts.map(o => ({
+      k: o.k, at: o.at,
+      state: !Store.answered ? 'idle' : o.ok ? 'ok' : (o.k === Store.chosen || o.k === Store.playingKey) ? 'ng' : 'dim',
+    }));
+  },
+  async playSetup() {
+    const q = Store.q;
+    Store.phase = 'setup'; Store.playingKey = null;
+    renderAnswer();
+    const done = await Anim.play(Store.setupTL, Store.base, [], fr => Court.draw(fr, { who: q.who }));
+    if (!done || Store.q !== q) return;
+    Store.phase = Store.answered ? 'review' : 'ask';
+    Store.askAt = performance.now();
+    Court.draw(frameAt(Store.setupTL, Store.base, Store.setupTL.total + 1, []), { who: q.who, rings: this.rings() });
+    renderAnswer();
+  },
+  choose(k) {
+    const q = Store.q;
+    if (Store.answered || Store.phase !== 'ask') return;
+    const o = q.opts.find(x => x.k === k);
+    if (!o) return;
+    Store.answered = true; Store.chosen = k; Store.phase = 'review';
+    Store.res[q.id] = !!o.ok;
+    Progress.record(q.id, !!o.ok);
+    console.log(`回答 ${q.id}: ${k} → ${o.ok ? '正解' : '不正解'}`);
+    renderAnswer();
+    this.playOption(k);
+  },
+  async playOption(k) {
+    const q = Store.q, o = q.opts.find(x => x.k === k);
+    Store.phase = 'review'; Store.playingKey = k;
+    markPlaying();
+    const tl = buildTimeline(Store.after, o.then, null);
+    const done = await Anim.play(tl, Store.after, Store.afterTrails, fr => Court.draw(fr, { who: q.who, rings: this.rings() }));
+    if (!done || Store.q !== q) return;
+    Store.playingKey = null;
+    markPlaying();
+  },
+  next() {
+    if (Store.i + 1 < Store.set.length) { Store.i++; Quiz.load(Store.set[Store.i]); window.scrollTo(0, 0); }
+    else renderResult();
+  },
+};
+
+function renderAnswer() {
+  const q = Store.q, box = $('#q-answer');
+  if (!Store.answered) {
+    const wait = Store.phase === 'setup';
+    box.innerHTML = `${q.think ? '<p class="look"><b>打つ前に見る</b>① 打点の高さ　② 相手の位置　→ ③ ねらい（攻め・守り・崩す）</p>' : ''}
+      <p class="status">${wait ? '場面を再生中…（コートを押すと早送り）' : q.type === 'plan' ? '打つ順番を、下のボタンで選ぶ' : 'コートの円か、下のボタンで答える'}</p>
+      <div class="opts">${q.opts.map(o => `<button class="opt" data-k="${esc(o.k)}" ${wait ? 'disabled' : ''}>
+        <span class="k">${esc(o.k)}</span><span>${o.shot ? `<span class="shot">${esc(SHOT[o.shot].name)}</span>` : ''}${esc(o.label)}</span></button>`).join('')}</div>`;
+    return;
+  }
+  const ok = Store.res[q.id], right = okOpt(q);
+  const last = Store.i + 1 >= Store.set.length;
+  box.innerHTML = `
+    <div class="verdict ${ok ? 'ok' : 'ng'}">${ok ? '○ 正解' : '× ちがう'}${ok ? '' : `<small>正解は ${esc(right.k)}</small>`}</div>
+    ${q.think ? `<div class="sec"><span class="lab">考える順番</span><ol class="think">${q.think.map(t => { const [h, ...r] = t.split('：'); return `<li><b>${esc(h)}</b><span>${esc(r.join('：'))}</span></li>`; }).join('')}</ol></div>` : ''}
+    <div class="sec"><span class="lab">セオリー</span><p class="theory-t">${esc(q.theory)}</p></div>
+    <div class="sec"><span class="lab">それぞれの動きを見る</span>
+      <ul class="explain">${q.opts.map(o => `<li class="ex ${o.ok ? 'ok' : 'ng'}" data-k="${esc(o.k)}">
+        <button data-play="${esc(o.k)}"><span class="k">${esc(o.k)}</span><span class="j">${o.ok ? '○' : '×'}</span>
+          <span class="t">${o.shot ? `<span class="shot">${esc(SHOT[o.shot].name)}</span>` : ''}${esc(o.label)}${o.k === Store.chosen ? '<span class="you">あなたの答え</span>' : ''}</span>
+          <span class="play"><span class="ms">play_arrow</span><span class="pl">見る</span></span></button>
+        <p>${esc(o.why)}</p></li>`).join('')}</ul></div>
+    <div class="sec drill"><span class="lab">練習でやってみよう</span><p>${esc(q.drill)}</p></div>
+    <div class="next-row"><button class="btn primary" id="btn-next">${last ? '結果を見る' : '次の問題へ'}</button></div>`;
+  markPlaying();
+}
+function markPlaying() {
+  document.querySelectorAll('.ex').forEach(li => {
+    const on = li.dataset.k === Store.playingKey;
+    li.classList.toggle('playing', on);
+    const pl = li.querySelector('.pl'); if (pl) pl.textContent = on ? '再生中' : '見る';
+  });
+}
+
+/* ---------- [S11] 結果 ---------- */
+function renderResult() {
+  const ids = Store.set, okN = ids.filter(id => Store.res[id]).length;
+  const miss = ids.filter(id => !Store.res[id]);
+  const today = Store.kind === 'today';
+  if (today) { Progress.data.today.last[Store.mode] = { score: okN, total: ids.length, at: localDate() }; Progress.save(); }
+  $('#view-result').innerHTML = `
+    <div class="res-head"><span class="lab">${today ? '今日の10問の結果' : '結果'}</span><p class="score"><b>${okN}</b>/ ${ids.length} 問 正解</p></div>
+    <ol class="res-list">${ids.map(id => { const q = QMAP[id], ok = Store.res[id];
+      return `<li class="${ok ? 'ok' : 'ng'}"><span class="j">${ok ? '○' : '×'}</span><div><b>${esc(q.title)}</b><span class="th">${esc(q.theory)}</span></div></li>`; }).join('')}</ol>
+    <div class="res-actions">
+      ${miss.length ? `<button class="btn primary" id="btn-retry">まちがえた ${miss.length} 問をもう一度</button>` : ''}
+      ${today ? `<button class="btn ${miss.length ? '' : 'primary'}" id="btn-today">新しい10問</button>` : ''}
+      <button class="btn ${miss.length || today ? '' : 'primary'}" id="btn-home">ホームへ</button>
+    </div>`;
+  Store.retry = miss;
+  show('result');
+}
+
+/* ---------- [S12] 操作のつなぎこみ ---------- */
+/** スマホで解説を読んでいる途中に「見る」を押したら、コートが見える所まで戻す */
+function showStage() {
+  const r = $('.stage').getBoundingClientRect();
+  const seen = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+  if (seen < r.height * 0.6) $('.stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function bind() {
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    Store.mode = t.dataset.mode; Progress.data.mode = Store.mode; Progress.save(); renderHome();
+  }));
+  $('#home-body').addEventListener('click', e => { const b = e.target.closest('[data-start]'); if (b && !b.disabled) startFrom(b.dataset.start); });
+  $('#btn-back').addEventListener('click', () => { renderHome(); show('home'); });
+  $('#btn-replay').addEventListener('click', () => Quiz.playSetup());
+  $('#btn-slow').addEventListener('click', e => {
+    Anim.slow = !Anim.slow; Progress.data.slow = Anim.slow; Progress.save();
+    e.currentTarget.setAttribute('aria-pressed', Anim.slow);
+  });
+  $('#court').addEventListener('click', e => {
+    const r = e.target.closest('.ring');
+    // 早送りのタップが、出てきたばかりの円に当たって答えにならないように、円が出てすぐは受けつけない
+    if (r && !Store.answered && Store.phase === 'ask') { if (performance.now() - Store.askAt > 400) Quiz.choose(r.dataset.k); return; }
+    if (Anim.playing) Anim.skip = true;
+  });
+  $('#court').addEventListener('keydown', e => {
+    const r = e.target.closest && e.target.closest('.ring');
+    if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); Quiz.choose(r.dataset.k); }
+  });
+  $('#q-answer').addEventListener('click', e => {
+    const o = e.target.closest('.opt'); if (o && !o.disabled) { Quiz.choose(o.dataset.k); return; }
+    const p = e.target.closest('[data-play]'); if (p) { showStage(); Quiz.playOption(p.dataset.play); return; }
+    if (e.target.closest('#btn-next')) Quiz.next();
+  });
+  $('#view-result').addEventListener('click', e => {
+    if (e.target.closest('#btn-retry')) startSet(Store.retry);
+    if (e.target.closest('#btn-today')) startFrom('today');
+    if (e.target.closest('#btn-home')) { renderHome(); show('home'); }
+  });
+  let armed = 0;
+  $('#btn-reset').addEventListener('click', e => {
+    const b = e.currentTarget;
+    if (Date.now() - armed < 4000) { Progress.reset(); renderHome(); b.textContent = '記録を消しました'; b.classList.remove('warn'); armed = 0; setTimeout(() => { b.textContent = '記録を消す'; }, 2500); return; }
+    armed = Date.now(); b.textContent = 'もう一度押すと、正解の記録がすべて消えます'; b.classList.add('warn');
+    setTimeout(() => { if (armed && Date.now() - armed >= 4000) { b.textContent = '記録を消す'; b.classList.remove('warn'); armed = 0; } }, 4100);
+  });
+  $('#btn-copylog').addEventListener('click', () => {
+    const text = DebugLog.lines.join('\n') || '(ログなし)';
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => console.log('ログをコピーしました'), () => console.warn('コピーできませんでした'));
+  });
+}
+
+/* ---------- [S13] 問題データの点検（検証用・BD.lint()） ---------- */
+function lint() {
+  const errs = [];
+  const inCourt = (p, singles) => Math.abs(p[0]) <= (singles ? 2.59 : 3.05) + 1e-9 && p[1] >= 0 && p[1] <= 13.4;
+  const ids = new Set();
+  QUESTIONS.forEach(q => {
+    const tag = q.id;
+    if (ids.has(q.id)) errs.push(tag + ': id が重複'); ids.add(q.id);
+    if (q.opts.filter(o => o.ok).length !== 1) errs.push(tag + ': 正解がちょうど1つでない');
+    if (!CATS[q.mode].some(c => c.id === q.cat)) errs.push(tag + ': cat が無い');
+    if (!['A', 'B'].includes(q.who) || !q.start[q.who]) errs.push(tag + ': who がおかしい');
+    if (q.mode === 'singles' && Object.keys(q.start).some(k => !['A', 'C'].includes(k))) errs.push(tag + ': シングルスに A・C 以外がいる');
+    try {
+      const base = { pos: clonePos(q.start), sh: q.sh ? { x: q.sh[0], y: q.sh[1], h: q.sh[2] } : null };
+      const st = buildTimeline(base, q.setup, firstHit(okOpt(q).then));
+      const hitter = st.end.sh ? Object.keys(st.end.pos).find(k => dist(st.end.pos[k], [st.end.sh.x, st.end.sh.y]) < 0.05) : null;
+      q.opts.forEach(o => {
+        const t = `${tag} ${o.k}`;
+        const h = firstHit(o.then);
+        if (h && hitter && h.hit !== hitter && q.setup.length) errs.push(t + `: 最初に打つ人(${h.hit})がシャトルの所にいない(${hitter})`);
+        const tl = buildTimeline(st.end, o.then, null);
+        tl.segs.forEach(sg => {
+          if (!sg.shot) return;
+          const inside = inCourt(sg.shot.to, q.mode === 'singles');
+          if (sg.shot.to[2] === 0 && !inside && !sg.out) errs.push(t + ': 落ちる所がコートの外');
+          if (sg.out && inside) errs.push(t + ': out なのにコートの中に落ちる');
+          if (sg.shot.a > 6) errs.push(t + ': 軌道の山が高すぎる');
+        });
+        if ((q.cat === 'ito' || q.cat === 'kumitate') && !(Array.isArray(q.think) && q.think.length === 3)) errs.push(t + ': 考える順番（think）が3行でない');
+        if (q.think && !/^だから：(攻め|守り|崩す)/.test(q.think[2])) errs.push(t + ': think の3行目が「だから：攻め／守り／崩す」で始まらない');
+        if (q.type === 'move') {
+          const m = o.then.find(s => s.mv && s.mv[q.who]);
+          if (!m || dist(m.mv[q.who], o.at) > 1e-9) errs.push(t + ': 円の位置と、動く先が合わない');
+        } else if (q.type === 'plan') {
+          if (!o.then[0] || o.then[0].hit !== q.who) errs.push(t + ': 最初の1打が who でない');
+          if (o.ok && o.then.filter(s => s.hit === 'A' || s.hit === 'B').length < 2) errs.push(t + ': 組み立ての正解に、自分たちの打球が2本以上ない');
+          if (!/①/.test(o.label)) errs.push(t + ': 組み立ての選択肢が「① …」の形でない');
+        } else if (q.type === 'shot') {
+          if (!o.then[0] || o.then[0].hit !== q.who) errs.push(t + ': 最初の1打が who でない');
+          else if (dist(o.then[0].to, o.at) > 1.5) errs.push(t + ': 円とねらいがずれている');
+          if (!o.shot || !SHOT[o.shot]) errs.push(t + ': 球種の表示が無い');
+          const sv = o.then[0];
+          if (sv && /^s(short|long|half)$/.test(sv.shot)) {
+            const longLine = q.mode === 'doubles' ? 12.64 : 13.4, side = q.mode === 'doubles' ? 3.05 : 2.59;
+            const diag = Math.sign(sv.to[0]) !== Math.sign(q.start[q.who][0]);
+            if (sv.to[1] < 8.68 || sv.to[1] > longLine || Math.abs(sv.to[0]) > side || !diag) errs.push(t + ': サービスがサービスコートに入っていない');
+          }
+        } else errs.push(t + ': type が move／shot／plan のどれでもない');
+      });
+    } catch (e) { errs.push(tag + ': ' + e.message); }
+  });
+  return errs;
+}
+
+/* ---------- [S14] 検証用の入口（window.BD） ---------- */
+window.BD = {
+  fast(on = true) { FAST = on; return FAST; },
+  lint,
+  async go(id) { startSet([id]); await Store.setupDone; return BD.state(); },
+  pick(k) { Quiz.choose(k); return Store.answered; },
+  async ok(id) { await BD.go(id); Quiz.choose(okOpt(QMAP[id]).k); return BD.state(); },
+  async ng(id, k) { await BD.go(id); Quiz.choose(k); return BD.state(); },
+  play(k) { Quiz.playOption(k); return k; },
+  state() { return { view: Store.view, q: Store.q && Store.q.id, phase: Store.phase, answered: Store.answered, chosen: Store.chosen, playing: Anim.playing, i: Store.i, n: Store.set.length }; },
+  ids() { return QUESTIONS.map(q => q.id); },
+  pickToday,
+};
+
+/* ---------- [S15] 起動 ---------- */
+(function boot() {
+  try {
+    Progress.load();
+    Store.mode = CATS[Progress.data.mode] ? Progress.data.mode : 'doubles';
+    Anim.slow = !!Progress.data.slow;
+    $('#btn-slow').setAttribute('aria-pressed', Anim.slow);
+    Court.init();
+    bind();
+    renderHome();
+    const errs = lint();
+    if (errs.length) console.warn('問題データの点検: ' + errs.join(' / '));
+    console.log(`起動しました（問題 ${QUESTIONS.length} 問）`);
+  } catch (e) {
+    console.error('起動に失敗しました: ' + e.message);
+  }
+})();
+</script>
+</body>
+</html>
