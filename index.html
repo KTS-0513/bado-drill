@@ -1927,9 +1927,9 @@ function ringSVG(r) {
   for (let i = 0; i < 32; i++) { const t = i / 32 * Math.PI * 2; pts.push(pt(proj(r.at[0] + Math.cos(t) * 0.55, r.at[1] + Math.sin(t) * 0.55))); }
   const [cx, cy, s] = proj(r.at[0], r.at[1]);
   const st = { idle: ['rgba(255,255,255,.16)', '#fff', '9 7'], ok: ['rgba(46,200,110,.42)', '#b9f5cf', ''], ng: ['rgba(235,80,60,.42)', '#ffc1b8', ''], dim: ['rgba(255,255,255,.06)', 'rgba(255,255,255,.45)', '9 7'] }[r.state];
-  const attrs = r.state === 'idle' ? ` role="button" tabindex="0" aria-label="${esc(r.k)}を選ぶ" style="cursor:pointer"` : '';
+  const attrs = r.state === 'idle' ? ` role="button" tabindex="0" aria-label="${esc(r.label)}を選ぶ" style="cursor:pointer"` : '';
   return `<g class="ring" data-k="${esc(r.k)}"${attrs}><polygon points="${pts.join(' ')}" fill="${st[0]}" stroke="${st[1]}" stroke-width="3.5" stroke-dasharray="${st[2]}"/>`
-    + `<text x="${f1(cx)}" y="${f1(cy + 13 * s)}" font-size="${f1(38 * s)}" fill="${r.state === 'dim' ? 'rgba(255,255,255,.55)' : '#fff'}">${esc(r.k)}</text></g>`;
+    + `<text x="${f1(cx)}" y="${f1(cy + 13 * s)}" font-size="${f1(38 * s)}" fill="${r.state === 'dim' ? 'rgba(255,255,255,.55)' : '#fff'}">${esc(r.label)}</text></g>`;
 }
 function landSVG(p) {
   const [x, y, s] = proj(p[0], p[1], 0);
@@ -2156,6 +2156,18 @@ function startSet(ids, kind = 'set') {
 
 /* ---------- [S10] 問題を解く ---------- */
 const okOpt = q => q.opts.find(o => o.ok);
+/*
+ * 選択肢の並びは、問題を出すたびに入れかえる（正解がいつも「ア」にならないように）。
+ * データの k（ア・イ・ウ）は中の名前としてそのまま使い、画面に出す記号だけを、並んだ順に ア・イ・ウ とつけ直す。
+ */
+const LABELS = ['ア', 'イ', 'ウ', 'エ'];
+function shuffleOpts(q, rand = Math.random) {
+  const a = q.opts.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+/** 中の名前 k → 画面に出す記号 */
+const dk = k => (Store.disp && Store.disp[k]) || k;
 const catName = q => (CATS[q.mode].find(c => c.id === q.cat) || {}).name || '';
 
 const Quiz = {
@@ -2163,6 +2175,8 @@ const Quiz = {
     const q = QMAP[id];
     if (!q) { console.error('問題が見つかりません: ' + id); return; }
     Object.assign(Store, { q, answered: false, chosen: null, playingKey: null });
+    Store.opts = shuffleOpts(q);
+    Store.disp = Object.fromEntries(Store.opts.map((o, i) => [o.k, LABELS[i]]));
     Court.setMode(q.mode);
     Store.base = { pos: clonePos(q.start), sh: q.sh ? { x: q.sh[0], y: q.sh[1], h: q.sh[2] } : null };
     Store.setupTL = buildTimeline(Store.base, q.setup, firstHit(okOpt(q).then));
@@ -2178,8 +2192,8 @@ const Quiz = {
   rings() {
     const q = Store.q;
     if (Store.phase === 'setup' || q.type === 'plan') return null;   // 組み立ては2本以上の流れなので、円1つでは表せない
-    return q.opts.map(o => ({
-      k: o.k, at: o.at,
+    return Store.opts.map(o => ({
+      k: o.k, label: dk(o.k), at: o.at,
       state: !Store.answered ? 'idle' : o.ok ? 'ok' : (o.k === Store.chosen || o.k === Store.playingKey) ? 'ng' : 'dim',
     }));
   },
@@ -2228,19 +2242,19 @@ function renderAnswer() {
     const wait = Store.phase === 'setup';
     box.innerHTML = `${q.think ? '<p class="look"><b>打つ前に見る</b>① 打点の高さ　② 相手の位置　→ ③ ねらい（攻め・守り・崩す）</p>' : ''}
       <p class="status">${wait ? '場面を再生中…（コートを押すと早送り）' : q.type === 'plan' ? '打つ順番を、下のボタンで選ぶ' : 'コートの円か、下のボタンで答える'}</p>
-      <div class="opts">${q.opts.map(o => `<button class="opt" data-k="${esc(o.k)}" ${wait ? 'disabled' : ''}>
-        <span class="k">${esc(o.k)}</span><span>${o.shot ? `<span class="shot">${esc(SHOT[o.shot].name)}</span>` : ''}${esc(o.label)}</span></button>`).join('')}</div>`;
+      <div class="opts">${Store.opts.map(o => `<button class="opt" data-k="${esc(o.k)}" ${wait ? 'disabled' : ''}>
+        <span class="k">${esc(dk(o.k))}</span><span>${o.shot ? `<span class="shot">${esc(SHOT[o.shot].name)}</span>` : ''}${esc(o.label)}</span></button>`).join('')}</div>`;
     return;
   }
   const ok = Store.res[q.id], right = okOpt(q);
   const last = Store.i + 1 >= Store.set.length;
   box.innerHTML = `
-    <div class="verdict ${ok ? 'ok' : 'ng'}">${ok ? '○ 正解' : '× ちがう'}${ok ? '' : `<small>正解は ${esc(right.k)}</small>`}</div>
+    <div class="verdict ${ok ? 'ok' : 'ng'}">${ok ? '○ 正解' : '× ちがう'}${ok ? '' : `<small>正解は ${esc(dk(right.k))}</small>`}</div>
     ${q.think ? `<div class="sec"><span class="lab">考える順番</span><ol class="think">${q.think.map(t => { const [h, ...r] = t.split('：'); return `<li><b>${esc(h)}</b><span>${esc(r.join('：'))}</span></li>`; }).join('')}</ol></div>` : ''}
     <div class="sec"><span class="lab">セオリー</span><p class="theory-t">${esc(q.theory)}</p></div>
     <div class="sec"><span class="lab">それぞれの動きを見る</span>
-      <ul class="explain">${q.opts.map(o => `<li class="ex ${o.ok ? 'ok' : 'ng'}" data-k="${esc(o.k)}">
-        <button data-play="${esc(o.k)}"><span class="k">${esc(o.k)}</span><span class="j">${o.ok ? '○' : '×'}</span>
+      <ul class="explain">${Store.opts.map(o => `<li class="ex ${o.ok ? 'ok' : 'ng'}" data-k="${esc(o.k)}">
+        <button data-play="${esc(o.k)}"><span class="k">${esc(dk(o.k))}</span><span class="j">${o.ok ? '○' : '×'}</span>
           <span class="t">${o.shot ? `<span class="shot">${esc(SHOT[o.shot].name)}</span>` : ''}${esc(o.label)}${o.k === Store.chosen ? '<span class="you">あなたの答え</span>' : ''}</span>
           <span class="play"><span class="ms">play_arrow</span><span class="pl">見る</span></span></button>
         <p>${esc(o.why)}</p></li>`).join('')}</ul></div>
@@ -2392,6 +2406,8 @@ window.BD = {
   state() { return { view: Store.view, q: Store.q && Store.q.id, phase: Store.phase, answered: Store.answered, chosen: Store.chosen, playing: Anim.playing, i: Store.i, n: Store.set.length }; },
   ids() { return QUESTIONS.map(q => q.id); },
   pickToday,
+  disp() { return Store.opts && Store.opts.map(o => ({ k: o.k, shown: dk(o.k), ok: !!o.ok })); },
+  shuffleOpts,
 };
 
 /* ---------- [S15] 起動 ---------- */
